@@ -1,0 +1,2057 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PT Indolima Perkasa — Dashboard Forms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================================
+       DESIGN TOKENS
+       ========================================================= */
+        :root {
+            --bg-page: #f4f7f6;
+            --bg-card: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --primary: #1a5276;
+            --primary-light: #eaf2f8;
+            --primary-hover: #154a6b;
+            --accent-teal: #0d9488;
+            --accent-red: #c62828;
+            --accent-red-light: #fde8e8;
+            --accent-red-hover: #a32222;
+            --border: #e2e8f0;
+            --border-focus: #1a5276;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.25s ease;
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 64px;
+            --sidebar-width: 260px;
+        }
+
+        /* Dark mode */
+        [data-theme="dark"] {
+            --bg-page: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #60a5fa;
+            --primary-light: #1e3a5f;
+            --primary-hover: #3b82f6;
+            --accent-teal: #2dd4bf;
+            --accent-red: #f87171;
+            --accent-red-light: #451a1a;
+            --accent-red-hover: #ef4444;
+            --border: #334155;
+            --border-focus: #60a5fa;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        /* =========================================================
+       RESET & BASE
+       ========================================================= */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        /* =========================================================
+       ANIMATIONS
+       ========================================================= */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(26, 82, 118, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(26, 82, 118, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(26, 82, 118, 0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* =========================================================
+       HEADER
+       ========================================================= */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+            transition: background var(--transition-base), border-color var(--transition-base);
+        }
+
+        .site-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .site-header .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .site-header .brand span {
+            background: linear-gradient(135deg, var(--primary), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border);
+            transition: all var(--transition-fast);
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: rotate(15deg);
+        }
+
+        .theme-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* =========================================================
+       LAYOUT: SIDEBAR + MAIN
+       ========================================================= */
+        .layout {
+            display: flex;
+            padding-top: var(--header-height);
+            min-height: 100vh;
+        }
+
+        /* ---- Sidebar ---- */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            overflow-y: auto;
+            z-index: 900;
+            transition: transform var(--transition-slow), background var(--transition-base);
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 0 12px;
+            margin-bottom: 12px;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 3px;
+            height: 0;
+            background: var(--primary);
+            border-radius: 0 2px 2px 0;
+            transform: translateY(-50%);
+            transition: height var(--transition-fast);
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-link:hover::before {
+            height: 20px;
+        }
+
+        .nav-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-link.active::before {
+            height: 24px;
+        }
+
+        .nav-link .icon {
+            width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-link .icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Nav badge */
+        .nav-badge {
+            margin-left: auto;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-badge.red {
+            background: var(--accent-red-light);
+            color: var(--accent-red);
+        }
+
+        .nav-badge.blue {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* ---- Main Content ---- */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px 36px 48px;
+            max-width: calc(100% - var(--sidebar-width));
+        }
+
+        /* =========================================================
+       HERO / WELCOME
+       ========================================================= */
+        .hero {
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s var(--transition-slow) both;
+        }
+
+        .hero h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 540px;
+        }
+
+        /* =========================================================
+       CARD COMPONENT
+       ========================================================= */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow var(--transition-base), transform var(--transition-base);
+            animation: fadeInUp 0.6s var(--transition-slow) both;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 24px 28px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .card-header-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 1.25rem;
+        }
+
+        .card-header-icon.blue {
+            background: var(--primary-light);
+        }
+
+        .card-header-icon.teal {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        .card-header-icon.red {
+            background: var(--accent-red-light);
+            color: var(--accent-red);
+        }
+
+        .card-header-text {
+            flex: 1;
+        }
+
+        .card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 4px;
+        }
+
+        .card-header p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .card-body {
+            padding: 20px 28px 28px;
+        }
+
+        /* Card spacing */
+        .card+.card {
+            margin-top: 28px;
+        }
+
+        /* =========================================================
+       FORM ELEMENTS
+       ========================================================= */
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-muted);
+            margin: 20px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .section-label:first-child {
+            margin-top: 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .req {
+            color: var(--accent-red);
+            font-weight: 700;
+        }
+
+        .hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Inputs */
+        .field input[type="text"],
+        .field input[type="email"],
+        .field input[type="tel"],
+        .field input[type="date"],
+        .field input[type="number"],
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 90px;
+            line-height: 1.5;
+        }
+
+        .field select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        /* Radio group */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .radio-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+
+        .radio-item:hover {
+            border-color: var(--border-focus);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .radio-item:has(input:checked) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .radio-item input[type="radio"] {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            margin: 0;
+            position: relative;
+            transition: border-color var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .radio-item input[type="radio"]:checked {
+            border-color: var(--primary);
+            border-width: 5px;
+        }
+
+        /* File upload */
+        .file-upload {
+            position: relative;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            text-align: center;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            background: var(--bg-page);
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload svg {
+            width: 32px;
+            height: 32px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: color var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .file-upload:hover svg {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .file-upload p {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .file-upload p small {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .file-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 8px;
+            display: none;
+            word-break: break-all;
+        }
+
+        .file-name.show {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        /* Buttons */
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            margin-top: 8px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 82, 118, 0.25);
+        }
+
+        .btn-submit:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-submit.red {
+            background: var(--accent-red);
+        }
+
+        .btn-submit.red:hover {
+            background: var(--accent-red-hover);
+            box-shadow: 0 8px 20px rgba(198, 40, 40, 0.25);
+        }
+
+        /* =========================================================
+       BLACKLIST CARD SPECIAL STYLING
+       ========================================================= */
+        .card-blacklist {
+            border-color: rgba(198, 40, 40, 0.15);
+        }
+
+        .card-blacklist .card-header {
+            background: var(--accent-red-light);
+            border-bottom: 1px solid rgba(198, 40, 40, 0.1);
+            padding-bottom: 20px;
+            margin: 0;
+        }
+
+        .card-blacklist .card-header h2 {
+            color: var(--accent-red);
+        }
+
+        .card-blacklist .card-body {
+            background: var(--bg-card);
+        }
+
+        /* =========================================================
+       PROGRESS INDICATOR (top of each card)
+       ========================================================= */
+        .card-progress {
+            height: 3px;
+            background: var(--border);
+            border-radius: 0 0 2px 2px;
+            overflow: hidden;
+        }
+
+        .card-progress-bar {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            border-radius: 0 2px 2px 0;
+            transition: width 0.4s ease;
+        }
+
+        .card-blacklist .card-progress-bar {
+            background: var(--accent-red);
+        }
+
+        /* =========================================================
+       TOAST NOTIFICATION
+       ========================================================= */
+        .toast-container {
+            position: fixed;
+            top: calc(var(--header-height) + 16px);
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-xl);
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 280px;
+            max-width: 380px;
+            animation: toastIn 0.35s ease both;
+            pointer-events: auto;
+        }
+
+        .toast.hiding {
+            animation: toastOut 0.3s ease both;
+        }
+
+        .toast-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        .toast.success {
+            border-left-color: #059669;
+        }
+
+        .toast.success .toast-icon {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .toast.error {
+            border-left-color: var(--accent-red);
+        }
+
+        .toast.error .toast-icon {
+            background: var(--accent-red-light);
+            color: var(--accent-red);
+        }
+
+        /* =========================================================
+       MOBILE SIDEBAR TOGGLE
+       ========================================================= */
+        .sidebar-toggle {
+            display: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            place-items: center;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .sidebar-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 850;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+        @media (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 0;
+            }
+
+            .sidebar-toggle {
+                display: grid;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                box-shadow: var(--shadow-xl);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 24px 18px 36px;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .site-header {
+                padding: 0 16px;
+            }
+
+            .card-header {
+                padding: 20px 20px 0;
+            }
+
+            .card-body {
+                padding: 16px 20px 24px;
+            }
+
+            .hero h1 {
+                font-size: 1.4rem;
+            }
+
+            .toast-container {
+                right: 12px;
+                left: 12px;
+            }
+
+            .toast {
+                max-width: 100%;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.2rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .radio-item {
+                width: 100%;
+            }
+        }
+
+        /* =========================================================
+       SCROLL SPY ACTIVE STATES
+       ========================================================= */
+        .section-anchor {
+            display: block;
+            position: relative;
+            top: -80px;
+            visibility: hidden;
+        }
+
+        /* =========================================================
+       UTILITY
+       ========================================================= */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+            </div>
+            <span>PT Indolima Perkasa</span>
+        </div>
+        <div class="header-actions">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+                <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== OVERLAY ==================== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ==================== TOAST CONTAINER ==================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ==================== LAYOUT ==================== -->
+    <div class="layout">
+
+        <!-- ---- Sidebar ---- -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Menu Navigasi</div>
+            <nav>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#section-referensi" data-section="section-referensi">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                            </span>
+                            Surat Referensi
+                            <span class="nav-badge blue">Form</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section-datadiri" data-section="section-datadiri">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                            </span>
+                            Data Diri
+                            <span class="nav-badge blue">Form</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section-pelamar" data-section="section-pelamar">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                                </svg>
+                            </span>
+                            Formulir Pelamar
+                            <span class="nav-badge blue">Form</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#section-blacklist" data-section="section-blacklist">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="15" y1="9" x2="9" y2="15" />
+                                    <line x1="9" y1="9" x2="15" y2="15" />
+                                </svg>
+                            </span>
+                            Blacklist
+                            <span class="nav-badge red">Restricted</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- ---- Main Content ---- -->
+        <main class="main">
+
+            <!-- Hero -->
+            <div class="hero">
+                <h1>Dashboard Forms</h1>
+                <p>Kelola formulir data karyawan, pelamar, surat referensi, dan laporan blacklist dalam satu dasbor
+                    terpadu.</p>
+            </div>
+
+            <!-- ==================== 1. REFERENCE LETTER ==================== -->
+            <span class="section-anchor" id="section-referensi"></span>
+            <div class="card" style="animation-delay:0.1s">
+                <div class="card-progress">
+                    <div class="card-progress-bar" id="progress-referensi"></div>
+                </div>
+                <div class="card-header">
+                    <div class="card-header-icon blue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                    </div>
+                    <div class="card-header-text">
+                        <h2>Surat Referensi</h2>
+                        <p>Pengajuan surat referensi kerja untuk karyawan yang telah menyelesaikan kontrak atau
+                            mengundurkan diri.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="form-referensi" onsubmit="handleSubmit(event, 'Surat Referensi')">
+
+                        <div class="section-label">Informasi Pribadi</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Sesuai KTP <span class="req">*</span></label>
+                                <input type="text" name="nama_ktp" required placeholder="Nama lengkap sesuai KTP"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                            <div class="field">
+                                <label>No KTP <span class="req">*</span></label>
+                                <input type="text" name="nik" required placeholder="16 digit NIK" maxlength="16"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Email <span class="req">*</span></label>
+                                <input type="email" name="email" required placeholder="email@gmail.com"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                            <div class="field">
+                                <label>No Telepon / WhatsApp Aktif <span class="req">*</span></label>
+                                <input type="tel" name="telepon" required placeholder="08xxxxxxxxxx"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Alamat Lengkap Sesuai KTP <span class="req">*</span></label>
+                            <textarea name="alamat" required
+                                placeholder="contoh: Jl Kutisari No.04, RT/02 RW/01, Tenggilis, Tenggilis Mejoyo, Surabaya"
+                                oninput="updateProgress('referensi')"></textarea>
+                            <div class="hint">Cantumkan RT/RW/Desa/Kec/Kab</div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Tempat Lahir <span class="req">*</span></label>
+                                <input type="text" name="tempat_lahir" required placeholder="Kota tempat lahir"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                            <div class="field">
+                                <label>Tanggal Lahir <span class="req">*</span></label>
+                                <input type="date" name="tanggal_lahir" required oninput="updateProgress('referensi')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Jenis Kelamin <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="jk_referensi" value="Laki-Laki"
+                                        required onchange="updateProgress('referensi')"> Laki-Laki</label>
+                                <label class="radio-item"><input type="radio" name="jk_referensi" value="Perempuan"
+                                        onchange="updateProgress('referensi')"> Perempuan</label>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Informasi Kerja</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Project <span class="req">*</span></label>
+                                <input type="text" name="project" required placeholder="Nama project"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                            <div class="field">
+                                <label>Jabatan <span class="req">*</span></label>
+                                <input type="text" name="jabatan" required placeholder="Jabatan kamu"
+                                    oninput="updateProgress('referensi')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Join Date <span class="req">*</span></label>
+                                <input type="date" name="join_date" required oninput="updateProgress('referensi')">
+                            </div>
+                            <div class="field">
+                                <label>End Date <span class="req">*</span></label>
+                                <input type="date" name="end_date" required oninput="updateProgress('referensi')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Alasan Pembuatan Surat Referensi <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="alasan" value="Habis Kontrak"
+                                        required onchange="updateProgress('referensi')"> Habis Kontrak</label>
+                                <label class="radio-item"><input type="radio" name="alasan" value="Mengundurkan Diri"
+                                        onchange="updateProgress('referensi')"> Mengundurkan Diri</label>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Dokumen</div>
+                        <div class="field">
+                            <label>Foto KTP <span class="req">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" name="foto_ktp" accept="image/*" required
+                                    onchange="handleFile(this); updateProgress('referensi')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <p>Klik untuk upload foto KTP<br><small>Maks 10 MB</small></p>
+                                <div class="file-name" id="fn-referensi-ktp"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <polyline points="19 12 12 19 5 12" />
+                            </svg>
+                            Kirim Formulir Referensi
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ==================== 2. PERSONAL DATA ==================== -->
+            <span class="section-anchor" id="section-datadiri"></span>
+            <div class="card" style="animation-delay:0.2s">
+                <div class="card-progress">
+                    <div class="card-progress-bar" id="progress-datadiri"></div>
+                </div>
+                <div class="card-header">
+                    <div class="card-header-icon blue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                    <div class="card-header-text">
+                        <h2>Data Diri Karyawan</h2>
+                        <p>Formulir data diri lengkap untuk keperluan administrasi karyawan PT Indolima Perkasa.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="form-datadiri" onsubmit="handleSubmit(event, 'Data Diri')">
+
+                        <div class="section-label">Informasi Pekerjaan</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Area <span class="req">*</span></label>
+                                <input type="text" name="area" required placeholder="Area penempatan"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Jabatan <span class="req">*</span></label>
+                                <input type="text" name="jabatan" required placeholder="Jabatan kamu"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Project <span class="req">*</span></label>
+                                <input type="text" name="project" required placeholder="Nama project"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Join Date <span class="req">*</span></label>
+                                <input type="date" name="join_date" required oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+
+                        <div class="section-label">Data Pribadi</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Lengkap Sesuai KTP <span class="req">*</span></label>
+                                <input type="text" name="nama_ktp" required placeholder="Nama lengkap"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>No KTP <span class="req">*</span></label>
+                                <input type="text" name="nik" required placeholder="16 digit NIK" maxlength="16"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Alamat Lengkap Sesuai KTP <span class="req">*</span></label>
+                            <textarea name="alamat_ktp" required
+                                placeholder="contoh: Jl Kutisari No.04, RT/02 RW/01, Tenggilis, Tenggilis Mejoyo, Surabaya"
+                                oninput="updateProgress('datadiri')"></textarea>
+                            <div class="hint">Cantumkan RT/RW/Desa/Kec/Kab</div>
+                        </div>
+                        <div class="field">
+                            <label>Alamat Domisili <span class="req">*</span></label>
+                            <textarea name="alamat_domisili" required placeholder="Alamat domisili saat ini"
+                                oninput="updateProgress('datadiri')"></textarea>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Tempat Lahir <span class="req">*</span></label>
+                                <input type="text" name="tempat_lahir" required placeholder="Kota tempat lahir"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Tanggal Lahir <span class="req">*</span></label>
+                                <input type="date" name="tanggal_lahir" required oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>No Telepon / WhatsApp <span class="req">*</span></label>
+                                <input type="tel" name="telepon" required placeholder="08xxxxxxxxxx"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Email <span class="req">*</span></label>
+                                <input type="email" name="email" required placeholder="email@gmail.com"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Agama <span class="req">*</span></label>
+                            <select name="agama" required onchange="updateProgress('datadiri')">
+                                <option value="">-- Pilih Agama --</option>
+                                <option>Islam</option>
+                                <option>Kristen</option>
+                                <option>Katolik</option>
+                                <option>Hindu</option>
+                                <option>Buddha</option>
+                                <option>Konghucu</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Jenis Kelamin <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="jk_datadiri" value="Laki-Laki"
+                                        required onchange="updateProgress('datadiri')"> Laki-Laki</label>
+                                <label class="radio-item"><input type="radio" name="jk_datadiri" value="Perempuan"
+                                        onchange="updateProgress('datadiri')"> Perempuan</label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Status Menikah <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="status_nikah" value="Belum Menikah"
+                                        required onchange="updateProgress('datadiri')"> Belum Menikah</label>
+                                <label class="radio-item"><input type="radio" name="status_nikah" value="Menikah"
+                                        onchange="updateProgress('datadiri')"> Menikah</label>
+                                <label class="radio-item"><input type="radio" name="status_nikah"
+                                        value="Cerai Hidup/Mati" onchange="updateProgress('datadiri')"> Cerai
+                                    Hidup/Mati</label>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Jumlah Anak <span class="req">*</span></label>
+                                <input type="number" name="jumlah_anak" required min="0" placeholder="0"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Tingkat Pendidikan <span class="req">*</span></label>
+                                <select name="pendidikan" required onchange="updateProgress('datadiri')">
+                                    <option value="">-- Pilih --</option>
+                                    <option>SMA</option>
+                                    <option>D1</option>
+                                    <option>D2</option>
+                                    <option>D3</option>
+                                    <option>D4/S1</option>
+                                    <option>S2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Data Keuangan</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>No NPWP <span class="req">*</span></label>
+                                <input type="text" name="npwp" required placeholder="Nomor NPWP"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Alamat NPWP <span class="req">*</span></label>
+                                <input type="text" name="alamat_npwp" required placeholder="Alamat sesuai NPWP"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>No Rekening Mandiri <span class="req">*</span></label>
+                            <input type="text" name="rekening" required placeholder="Isi 0 jika tidak ada"
+                                oninput="updateProgress('datadiri')">
+                            <div class="hint">Jika tidak ada isi 0</div>
+                        </div>
+
+                        <div class="section-label">Data Keluarga</div>
+                        <div class="field">
+                            <label>Nama Ibu Kandung <span class="req">*</span></label>
+                            <input type="text" name="ibu_kandung" required placeholder="Nama ibu kandung"
+                                oninput="updateProgress('datadiri')">
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Keluarga yang Bisa Dihubungi <span class="req">*</span></label>
+                                <input type="text" name="nama_keluarga" required placeholder="Nama keluarga"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>No Keluarga yang Bisa Dihubungi <span class="req">*</span></label>
+                                <input type="tel" name="telepon_keluarga" required placeholder="08xxxxxxxxxx"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Hubungan Keluarga <span class="req">*</span></label>
+                            <select name="hubungan" required onchange="updateProgress('datadiri')">
+                                <option value="">-- Pilih --</option>
+                                <option>Orang Tua</option>
+                                <option>Suami/Istri</option>
+                                <option>Saudara</option>
+                                <option>Lainnya</option>
+                            </select>
+                        </div>
+
+                        <div class="section-label">Dokumen</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Foto KTP <span class="req">*</span></label>
+                                <div class="file-upload">
+                                    <input type="file" name="foto_ktp" accept="image/*" required
+                                        onchange="handleFile(this); updateProgress('datadiri')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                    <p>Upload Foto KTP<br><small>Maks 10 MB</small></p>
+                                    <div class="file-name" id="fn-datadiri-ktp"></div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Foto SIM A/C <span class="req">*</span></label>
+                                <div class="file-upload">
+                                    <input type="file" name="foto_sim" accept="image/*" required
+                                        onchange="handleFile(this); updateProgress('datadiri')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                    <p>Upload Foto SIM<br><small>Maks 10 MB</small></p>
+                                    <div class="file-name" id="fn-datadiri-sim"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>No KK <span class="req">*</span></label>
+                                <input type="text" name="no_kk" required placeholder="Nomor Kartu Keluarga"
+                                    oninput="updateProgress('datadiri')">
+                            </div>
+                            <div class="field">
+                                <label>Foto KK <span class="req">*</span></label>
+                                <div class="file-upload">
+                                    <input type="file" name="foto_kk" accept="image/*" required
+                                        onchange="handleFile(this); updateProgress('datadiri')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                    <p>Upload Foto KK<br><small>Maks 10 MB</small></p>
+                                    <div class="file-name" id="fn-datadiri-kk"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Foto SKCK</label>
+                            <div class="file-upload">
+                                <input type="file" name="foto_skck" accept="image/*"
+                                    onchange="handleFile(this); updateProgress('datadiri')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <p>Upload Foto SKCK (opsional)<br><small>Maks 10 MB</small></p>
+                                <div class="file-name" id="fn-datadiri-skck"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <polyline points="19 12 12 19 5 12" />
+                            </svg>
+                            Kirim Formulir Data Diri
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ==================== 3. APPLICANT FORM ==================== -->
+            <span class="section-anchor" id="section-pelamar"></span>
+            <div class="card" style="animation-delay:0.3s">
+                <div class="card-progress">
+                    <div class="card-progress-bar" id="progress-pelamar"></div>
+                </div>
+                <div class="card-header">
+                    <div class="card-header-icon teal">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                        </svg>
+                    </div>
+                    <div class="card-header-text">
+                        <h2>Formulir Pelamar Indo5</h2>
+                        <p>Isi data diri kamu untuk melamar posisi di PT Indolima Perkasa. Pastikan semua data valid.
+                        </p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="form-pelamar" onsubmit="handleSubmit(event, 'Formulir Pelamar')">
+
+                        <div class="section-label">Data Diri Pelamar</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama Lengkap <span class="req">*</span></label>
+                                <input type="text" name="nama" required placeholder="Nama lengkap"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                            <div class="field">
+                                <label>Email <span class="req">*</span></label>
+                                <input type="email" name="email" required placeholder="email@gmail.com"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Usia <span class="req">*</span></label>
+                                <input type="number" name="usia" required min="17" max="60" placeholder="Usia"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                            <div class="field">
+                                <label>No Telepon Aktif / WhatsApp <span class="req">*</span></label>
+                                <input type="tel" name="telepon" required placeholder="08xxxxxxxxxx"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Tinggi Badan (cm) <span class="req">*</span></label>
+                                <input type="number" name="tinggi" required placeholder="contoh: 165"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                            <div class="field">
+                                <label>Berat Badan (kg) <span class="req">*</span></label>
+                                <input type="number" name="berat" required placeholder="contoh: 55"
+                                    oninput="updateProgress('pelamar')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Penempatan <span class="req">*</span></label>
+                            <input type="text" name="penempatan" required
+                                placeholder="Tulis area penempatan yang diinginkan" oninput="updateProgress('pelamar')">
+                        </div>
+                        <div class="field">
+                            <label>Jenis Kelamin <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="jk_pelamar" value="Perempuan"
+                                        required onchange="updateProgress('pelamar')"> Perempuan</label>
+                                <label class="radio-item"><input type="radio" name="jk_pelamar" value="Laki-Laki"
+                                        onchange="updateProgress('pelamar')"> Laki-Laki</label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Status Pelamar <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="status_pelamar"
+                                        value="Fresh Graduate" required onchange="updateProgress('pelamar')"> Fresh
+                                    Graduate</label>
+                                <label class="radio-item"><input type="radio" name="status_pelamar"
+                                        value="Berpengalaman" onchange="updateProgress('pelamar')">
+                                    Berpengalaman</label>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Pendidikan Terakhir <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="pendidikan" value="SMA" required
+                                        onchange="updateProgress('pelamar')"> SMA</label>
+                                <label class="radio-item"><input type="radio" name="pendidikan" value="Diploma 1"
+                                        onchange="updateProgress('pelamar')"> Diploma 1</label>
+                                <label class="radio-item"><input type="radio" name="pendidikan" value="Diploma 3"
+                                        onchange="updateProgress('pelamar')"> Diploma 3</label>
+                                <label class="radio-item"><input type="radio" name="pendidikan"
+                                        value="Diploma 4/Sarjana 1" onchange="updateProgress('pelamar')"> Diploma
+                                    4/Sarjana 1</label>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Posisi yang Dilamar</div>
+                        <div class="field">
+                            <label>Posisi yang Akan Dilamar <span class="req">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="posisi" value="SPG/SPB" required
+                                        onchange="updateProgress('pelamar')"> SPG/SPB</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="SMD/MD"
+                                        onchange="updateProgress('pelamar')"> SMD/MD</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Sales"
+                                        onchange="updateProgress('pelamar')"> Sales</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Admin"
+                                        onchange="updateProgress('pelamar')"> Admin</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Team Leader"
+                                        onchange="updateProgress('pelamar')"> Team Leader</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Area Coordinator"
+                                        onchange="updateProgress('pelamar')"> Area Coordinator</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Produksi"
+                                        onchange="updateProgress('pelamar')"> Produksi</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="SPV"
+                                        onchange="updateProgress('pelamar')"> SPV</label>
+                                <label class="radio-item"><input type="radio" name="posisi" value="Brand Ambassador"
+                                        onchange="updateProgress('pelamar')"> Brand Ambassador</label>
+                                <label class="radio-item"><input type="radio" name="posisi"
+                                        value="Medical Representative" onchange="updateProgress('pelamar')"> Medical
+                                    Representative</label>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Dokumen</div>
+                        <div class="field">
+                            <label>Upload CV Format PDF <span class="req">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" name="cv" accept=".pdf" required
+                                    onchange="handleFile(this); updateProgress('pelamar')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <p>Upload CV (PDF)<br><small>Maks 10 MB</small></p>
+                                <div class="file-name" id="fn-pelamar-cv"></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Upload Foto Terbaru Full Badan <span class="req">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" name="foto_full" accept="image/*" required
+                                    onchange="handleFile(this); updateProgress('pelamar')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <p>Upload Foto Full Badan<br><small>Maks 10 MB</small></p>
+                                <div class="file-name" id="fn-pelamar-foto"></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Pengalaman Kerja</label>
+                            <textarea name="pengalaman"
+                                placeholder="Ceritakan pengalaman kerja kamu sebelumnya (opsional)"
+                                oninput="updateProgress('pelamar')"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <polyline points="19 12 12 19 5 12" />
+                            </svg>
+                            Kirim Lamaran
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ==================== 4. BLACKLIST FORM ==================== -->
+            <span class="section-anchor" id="section-blacklist"></span>
+            <div class="card card-blacklist" style="animation-delay:0.4s">
+                <div class="card-progress">
+                    <div class="card-progress-bar" id="progress-blacklist"></div>
+                </div>
+                <div class="card-header">
+                    <div class="card-header-icon red">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                    </div>
+                    <div class="card-header-text">
+                        <h2>Indolima Blacklist</h2>
+                        <p>Formulir pelaporan dan pendataan karyawan yang masuk daftar blacklist perusahaan.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="form-blacklist" onsubmit="handleSubmit(event, 'Laporan Blacklist')">
+
+                        <div class="section-label">Data Karyawan</div>
+                        <div class="grid-2">
+                            <div class="field">
+                                <label>Nama <span class="req">*</span></label>
+                                <input type="text" name="nama" required placeholder="Nama lengkap karyawan"
+                                    oninput="updateProgress('blacklist')">
+                            </div>
+                            <div class="field">
+                                <label>NIK <span class="req">*</span></label>
+                                <input type="text" name="nik" required placeholder="Nomor Induk Karyawan"
+                                    oninput="updateProgress('blacklist')">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Ex Project <span class="req">*</span></label>
+                            <input type="text" name="ex_project" required placeholder="Nama project terakhir"
+                                oninput="updateProgress('blacklist')">
+                        </div>
+
+                        <div class="section-label">Dokumen & Keterangan</div>
+                        <div class="field">
+                            <label>Upload Foto / KTP <span class="req">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" name="foto_ktp" accept="image/*" required
+                                    onchange="handleFile(this); updateProgress('blacklist')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <p>Upload Foto atau KTP<br><small>Maks 10 MB</small></p>
+                                <div class="file-name" id="fn-blacklist-foto"></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Issue Blacklist <span class="req">*</span></label>
+                            <textarea name="issue" required
+                                placeholder="Jelaskan alasan/issue blacklist secara detail..." style="min-height:130px"
+                                oninput="updateProgress('blacklist')"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit red">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                            Kirim Laporan Blacklist
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer spacer -->
+            <div style="height: 60px"></div>
+        </main>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        /* =========================================================
+           THEME MANAGEMENT
+           ========================================================= */
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            const moon = document.getElementById('iconMoon');
+            const sun = document.getElementById('iconSun');
+            if (moon) moon.style.display = theme === 'dark' ? 'none' : 'block';
+            if (sun) sun.style.display = theme === 'dark' ? 'block' : 'none';
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        }
+        applyTheme(localStorage.getItem('theme') || 'light');
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        /* =========================================================
+           SIDEBAR MOBILE TOGGLE
+           ========================================================= */
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+        });
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        /* Close sidebar on nav link click (mobile) */
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+
+        /* =========================================================
+           SCROLL SPY — Active Nav Link
+           ========================================================= */
+        const sections = ['section-referensi', 'section-datadiri', 'section-pelamar', 'section-blacklist'];
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function updateActiveNav() {
+            const scrollPos = window.scrollY + 120;
+            let activeId = sections[0];
+            for (const id of sections) {
+                const el = document.getElementById(id);
+                if (el && el.offsetTop <= scrollPos) activeId = id;
+            }
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.section === activeId);
+            });
+        }
+        window.addEventListener('scroll', updateActiveNav, { passive: true });
+        updateActiveNav();
+
+        /* =========================================================
+           FILE UPLOAD — Show filename
+           ========================================================= */
+        function handleFile(input) {
+            const fileNameEl = input.closest('.file-upload').querySelector('.file-name');
+            if (input.files && input.files[0]) {
+                fileNameEl.textContent = input.files[0].name;
+                fileNameEl.classList.add('show');
+            } else {
+                fileNameEl.textContent = '';
+                fileNameEl.classList.remove('show');
+            }
+        }
+
+        /* =========================================================
+           PROGRESS BAR — Visual feedback per form
+           ========================================================= */
+        function updateProgress(formId) {
+            const form = document.getElementById('form-' + formId);
+            if (!form) return;
+            const fields = form.querySelectorAll('input, select, textarea');
+            const total = fields.length;
+            let filled = 0;
+            fields.forEach(f => {
+                if (f.type === 'radio') {
+                    const name = f.name;
+                    const checked = form.querySelector('input[name="' + name + '"]:checked');
+                    if (checked) filled++;
+                } else if (f.type === 'file') {
+                    if (f.files && f.files.length > 0) filled++;
+                } else {
+                    if (f.value.trim() !== '') filled++;
+                }
+            });
+            // Deduplicate radio counts
+            const radioNames = new Set();
+            form.querySelectorAll('input[type="radio"]').forEach(r => radioNames.add(r.name));
+            let radioFilled = 0;
+            radioNames.forEach(name => {
+                if (form.querySelector('input[name="' + name + '"]:checked')) radioFilled++;
+            });
+            let radioTotal = radioNames.size;
+            let otherFields = total - form.querySelectorAll('input[type="radio"]').length;
+            let otherFilled = filled - (form.querySelectorAll('input[type="radio"]:checked').length);
+            const uniqueTotal = otherFields + radioTotal;
+            const uniqueFilled = otherFilled + radioFilled;
+            const pct = uniqueTotal > 0 ? (uniqueFilled / uniqueTotal) * 100 : 0;
+            const bar = document.getElementById('progress-' + formId);
+            if (bar) bar.style.width = pct + '%';
+        }
+        // Initialize progress
+        ['referensi', 'datadiri', 'pelamar', 'blacklist'].forEach(id => updateProgress(id));
+
+        /* =========================================================
+           TOAST NOTIFICATION
+           ========================================================= */
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            const icon = type === 'success' ? '✓' : '!';
+            toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <span>${message}</span>
+      `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 3000);
+        }
+
+        /* =========================================================
+           FORM SUBMIT HANDLER
+           ========================================================= */
+        function handleSubmit(e, formName) {
+            e.preventDefault();
+            // Simulate processing
+            const btn = e.target.querySelector('.btn-submit');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
+          <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/>
+        </svg>
+        Mengirim...
+      `;
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                showToast('Formulir ' + formName + ' berhasil dikirim! Terima kasih.', 'success');
+                e.target.reset();
+                // Reset file name displays
+                e.target.querySelectorAll('.file-name').forEach(el => {
+                    el.textContent = '';
+                    el.classList.remove('show');
+                });
+                // Reset progress
+                const formId = e.target.id.replace('form-', '');
+                const bar = document.getElementById('progress-' + formId);
+                if (bar) bar.style.width = '0%';
+            }, 1200);
+        }
+
+        /* =========================================================
+           INPUT ANIMATION ENHANCEMENTS
+           ========================================================= */
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('focus', function () {
+                this.closest('.field')?.classList.add('focused');
+            });
+            el.addEventListener('blur', function () {
+                this.closest('.field')?.classList.remove('focused');
+            });
+        });
+
+        /* Add spin keyframe for loader */
+        const style = document.createElement('style');
+        style.textContent = `
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .field.focused label { color: var(--primary); transition: color 0.2s ease; }
+    `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

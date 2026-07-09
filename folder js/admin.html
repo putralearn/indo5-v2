@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indo5 Admin â€” Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+    <style>
+    .login-card {
+        background: #ffffff !important;
+        border: none !important;
+        border-radius: 48px !important;
+        padding: 44px 40px !important;
+        box-shadow: 0 20px 60px rgba(100,0,0,0.2) !important;
+        max-width: 440px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-logo">
+            <img src="logo.png" alt="Indonesia5 Logo" style="width:200px;height:auto;background:#fff;border-radius:12px;padding:8px 16px;display:block;margin:0 auto;">
+            <p style="color:#fff;font-size:1rem;font-weight:600;text-align:center;margin-top:12px;">Management Login Dashboard Admin</p>
+        </div>
+
+        <div class="login-card">
+            <!-- Alert -->
+            <div class="alert-box alert-error" id="alertBox">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="alertMsg">â€”</span>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step active" id="step1">
+                <div class="form-group">
+                    <label>Email</label>
+                    <div class="input-wrap">
+                        <i class="fa-brands fa-google"></i>
+                        <input type="email" id="loginEmail" placeholder="contoh@admin.com" autocomplete="email" spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div class="lockout-timer" id="lockoutTimer"></div>
+
+                <button class="login-btn" id="btnStep1" onclick="handleStep1()">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Lanjutkan
+                </button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step" id="step2">
+                <h3>Verifikasi 2FA</h3>
+                <p>Masukkan kode 6 digit dari <strong>Google Authenticator / Authy</strong> di HP kamu</p>
+
+                <div class="otp-hint">
+                    Kode berlaku selama <strong id="otpCountdown">60</strong> detik
+                </div>
+
+                <div class="otp-grid" id="otpGrid">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                </div>
+
+                <button class="login-btn" id="btnStep2" onclick="handleStep2()" style="margin-top:20px;">
+                    <i class="fa-solid fa-shield-check"></i>
+                    Verifikasi & Masuk
+                </button>
+
+                <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-sub);">
+                    <a href="#" onclick="goBack()" style="color:var(--primary);text-decoration:none;">
+                        â† Kembali ke login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

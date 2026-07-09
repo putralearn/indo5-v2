@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indo5 Admin â€” Login</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/login.css">
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-logo">
+            <img src="/foto%20logo/copy.png" alt="Indo5 Logo"
+                onerror="this.style.display='none';document.querySelector('.login-logo-fallback').style.display='block'">
+
+            <div class="login-logo-fallback">Indo5</div>
+
+            <h2>Indo5 Admin</h2>
+            <p>Management Portal â€” PT Indolima Perkasa</p>
+        </div>
+
+        <div class="login-card">
+
+            <!-- Step indicator -->
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step-dot active" id="dot1">1</div>
+                <div class="step-line" id="line1"></div>
+                <div class="step-dot" id="dot2">2</div>
+            </div>
+
+            <!-- Alert -->
+            <div class="alert-box alert-error" id="alertBox">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="alertMsg">â€”</span>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step active" id="step1">
+
+                <h3>Masuk ke Panel Admin</h3>
+                
+
+                <div class="security-badge">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    
+
+                <div class="form-group">
+                    <label>Email</label>
+
+                    <div class="input-wrap">
+                        <i class="fa-brands fa-google"></i>
+
+                        <input type="email" id="loginEmail" placeholder="contoh@admin.com" autocomplete="email"
+                            spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-user"></i>
+
+                        <input type="text" id="loginUsername" placeholder="admin" autocomplete="username"
+                            spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock"></i>
+
+                        <input type="password" id="loginPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                            autocomplete="current-password">
+
+                        <button class="eye-btn" onclick="toggleEye('loginPassword', this)" tabindex="-1">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lockout-timer" id="lockoutTimer"></div>
+
+                <button class="login-btn" id="btnStep1" onclick="handleStep1()">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Lanjutkan
+                </button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step" id="step2">
+
+                <h3>Verifikasi 2FA</h3>
+                <p>Masukkan kode 6 digit dari aplikasi autentikator Anda</p>
+
+                <div class="otp-hint">
+                    Kode berlaku selama
+                    <strong id="otpCountdown">60</strong>
+                    detik
+                </div>
+
+                <div class="otp-grid" id="otpGrid">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                </div>
+
+                <button class="login-btn" id="btnStep2" onclick="handleStep2()" style="margin-top:20px;">
+                    <i class="fa-solid fa-shield-check"></i>
+                    Verifikasi & Masuk
+                </button>
+
+                <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-sub);">
+                    <a href="#" onclick="goBack()" style="color:var(--primary);text-decoration:none;">
+                        â† Kembali ke login
+                    </a>
+                </p>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Â© 2026 PT Indolima Perkasa Â· Indo5 Admin v3
+            <br>
+
+            <span style="color:#ef4444;font-size:0.72rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Akses tidak sah akan dicatat dan dilaporkan
+            </span>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="/login.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,861 @@
+﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indo5 Admin - Management Portal V3</title>
+  <link rel="stylesheet" href="admin_dashboard.css?v=8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    /* â”€â”€ FOTO/DOKUMEN DI MODAL â”€â”€ */
+    .modal-photos-section { margin-top: 8px; }
+    .modal-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .modal-photo-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .modal-photo-label {
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-sub, #8b93a8);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .modal-photo-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      cursor: zoom-in;
+      transition: opacity 0.2s;
+      display: block;
+    }
+    .modal-photo-img:hover { opacity: 0.85; }
+    .modal-photo-pdf {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 140px;
+      padding: 16px;
+    }
+
+    /* â”€â”€ SECURITY SETTINGS â”€â”€ */
+    .security-form-group { margin-bottom: 16px; }
+    .security-form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-sub, #8b93a8);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .security-input-wrap { position: relative; }
+    .security-input-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub, #8b93a8);
+      font-size: 0.85rem;
+    }
+    .security-input {
+      width: 100%;
+      padding: 10px 10px 10px 36px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text, #e8eaf0);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .security-input:focus { border-color: var(--primary, #1E8E6B); }
+    .security-btn {
+      padding: 10px 20px;
+      background: var(--primary, #1E8E6B);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .security-btn:hover { opacity: 0.85; }
+    .security-btn.danger { background: #ef4444; }
+    .otp-setup-box {
+      background: rgba(139,26,26,0.08);
+      border: 1px solid rgba(229,57,53,0.2);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .otp-setup-qr {
+      width: 160px;
+      height: 160px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin: 0 auto;
+    }
+    .otp-verify-grid {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 12px 0;
+    }
+    .otp-verify-grid input {
+      width: 42px;
+      height: 48px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: transparent;
+      border: 2px solid #2c2c2c;
+      border-radius: 8px;
+      color: var(--text-main);
+      outline: none;
+    }
+    .otp-verify-grid input:focus { border-color: var(--primary, #1E8E6B); }
+    .security-status-on {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(30,142,107,0.15);
+      color: #34d399;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .security-status-off {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .security-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 20px 0;
+    }
+  
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+
+
+
+
+<style id="pw-fix">
+.security-input-wrap {
+    display: flex !important;
+    align-items: center !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+}
+.security-input-wrap .security-input {
+    flex: 1 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 10px 12px !important;
+    font-size: 0.9rem !important;
+    min-width: 0 !important;
+}
+.security-input-wrap > i {
+    display: none !important;
+}
+.security-input-wrap > button {
+    background: none !important;
+    border: none !important;
+    border-left: 1px solid #eee !important;
+    cursor: pointer !important;
+    color: #aaa !important;
+    font-size: 1rem !important;
+    padding: 0 12px !important;
+    height: 100% !important;
+    min-height: 40px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.2s !important;
+}
+.security-input-wrap > button:hover {
+    color: #e53935 !important;
+    background: rgba(229,57,53,0.05) !important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+
+
+<style id="custom-fixes">
+/* Modal zoom animasi */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; animation: fadeIn 0.2s ease; }
+.modal-box { animation: zoomIn 0.3s cubic-bezier(.34,1.56,.64,1); }
+.status-modal-box { animation: zoomIn 0.3s cubic-bezier(.34,1.56,.64,1); }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes zoomIn { from { transform:scale(0.7); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+/* Custom select styling */
+.status-select {
+    width:100% !important;
+    padding:12px 16px !important;
+    border:2px solid #e5e7eb !important;
+    border-radius:10px !important;
+    font-size:0.95rem !important;
+    color:#111 !important;
+    background:#fff !important;
+    cursor:pointer !important;
+    outline:none !important;
+    margin:12px 0 !important;
+    font-family:inherit !important;
+    -webkit-appearance:auto !important;
+    appearance:auto !important;
+}
+.status-select:focus {
+    border-color:#e53935 !important;
+    box-shadow:0 0 0 3px rgba(229,57,53,0.15) !important;
+}
+.status-select option {
+    padding:10px !important;
+    font-size:0.95rem !important;
+    color:#111 !important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+<style>
+.modal, .confirm-modal, [class*="modal"] {
+    transform: none !important;
+    zoom: 1 !important;
+}
+button:focus, button:active {
+    transform: none !important;
+    zoom: 1 !important;
+    outline: none !important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+<style id="btn-hover-fix">
+#confirmCancelBtn, #confirmOkBtn,
+.customConfirmBox button,
+button#confirmCancelBtn, button#confirmOkBtn {
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1) !important;
+}
+#confirmCancelBtn:hover {
+    transform: scale(1.06) !important;
+    background: rgba(255,255,255,0.08) !important;
+}
+#confirmOkBtn:hover {
+    transform: scale(1.06) !important;
+    filter: brightness(1.1) !important;
+}
+#confirmCancelBtn:active, #confirmOkBtn:active {
+    transform: scale(0.96) !important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+<style id="modal-btn-zoom-fix">
+.modal-btn-close, .modal-btn-approve {
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.modal-btn-close:hover {
+    transform: scale(1.06) !important;
+    background: rgba(0,0,0,0.05) !important;
+}
+.modal-btn-approve:hover {
+    transform: scale(1.06) !important;
+    filter: brightness(1.08) !important;
+    box-shadow: 0 4px 16px rgba(229,57,53,0.3) !important;
+}
+.modal-btn-close:active, .modal-btn-approve:active {
+    transform: scale(0.96) !important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+</style>
+</head>
+
+<body class="dark-theme">
+  <div class="dashboard-container">
+
+    <!-- â”€â”€ SIDEBAR â”€â”€ -->
+    <aside class="sidebar">
+      <div class="sidebar-header" style="margin-bottom:24px;">
+        <img src="/logo_transparent.png" style="width:150px;height:auto;display:block;margin:0 auto 12px auto;background:#fff;border-radius:8px;padding:6px 10px;"
+          alt="Logo Indolima" onerror="this.style.display='none'">
+        <div>
+          
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.95);font-weight:600;">Management Portal Admin</p>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <button id="navDashboard" class="menu-item active"><i class="fa-solid fa-border-all"></i> Dashboard</button>
+        <button id="navSettings" class="menu-item"><i class="fa-solid fa-gear"></i> Pengaturan</button>
+      </div>
+
+      <div class="menu-section">
+        <span>DATA FORMULIR</span>
+        <button class="menu-item nav-filter" data-filter="Data Diri Karyawan" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+          <i class="fa-solid fa-address-card" style="color:#111;"></i> <span style="color:#111;flex:1;text-align:left;">Data Diri Karyawan</span>
+          <span class="badge green" id="badge-karyawan">0</span>
+        </button>
+        <button class="menu-item nav-filter" data-filter="Surat Referensi" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+          <i class="fa-solid fa-file-lines" style="color:#111;"></i> <span style="color:#111;flex:1;text-align:left;">Surat Referensi</span>
+          <span class="badge blue" id="badge-referensi">0</span>
+        </button>
+        <button class="menu-item nav-filter" data-filter="Pelamar Indo5" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+          <i class="fa-solid fa-user-plus" style="color:#111;"></i> <span style="color:#111;flex:1;text-align:left;">Pelamar Indo5</span>
+          <span class="badge orange" id="badge-pelamar">0</span>
+        </button>
+        <button class="menu-item nav-filter" data-filter="Blacklist Indolima" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+          <i class="fa-solid fa-ban" style="color:#111;"></i> <span style="color:#111;flex:1;text-align:left;">Blacklist Indolima</span>
+          <span class="badge red" id="badge-blacklist">0</span>
+        </button>
+      </div>
+
+      <div class="menu-section">
+        <span>SISTEM</span>
+        <button class="menu-item logout" onclick="doLogout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- â”€â”€ MAIN â”€â”€ -->
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div>
+          <h2 id="pageTitle" style="font-size:1.4rem;font-weight:700;">Dashboard</h2>
+          <p id="pageSubtitle" style="color:var(--text-sub);font-size:0.85rem;margin-top:2px;"></p>
+        </div>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--text-sub)"></i>
+            <input type="text" id="searchInput" placeholder="Cari nama, NIK, status, tipe...">
+          </div>
+          
+        </div>
+      </header>
+
+      <!-- â”€â”€ DASHBOARD SECTION â”€â”€ -->
+      <section id="dashboardSection">
+        <div class="summary-cards">
+          <div class="card card-green" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <p>Data Diri Karyawan</p>
+            <h3 id="card-count-karyawan">0</h3>
+            <p class="trend"></p>
+          </div>
+          <div class="card card-blue" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <p>Surat Referensi</p>
+            <h3 id="card-count-referensi">0</h3>
+            <p class="trend"></p>
+          </div>
+          <div class="card card-yellow" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <p>Pelamar Indo5</p>
+            <h3 id="card-count-pelamar">0</h3>
+            <p class="trend"></p>
+          </div>
+          <div class="card card-red" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <p>Blacklist Indolima</p>
+            <h3 id="card-count-blacklist">0</h3>
+            <p class="trend"></p>
+          </div>
+        </div>
+
+        <div class="activity-section">
+          <div class="activity-header">
+            <div>
+              <h3>Aktivitas Terbaru</h3>
+              <p id="currentDate" style="font-size:0.82rem;color:var(--text-sub);margin-top:3px;"></p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+  <button class="export-btn-datadiri" onclick="exportExcelPerCategory('datadiri')"><i class="fa-solid fa-file-excel"></i> Data Diri</button>
+  <button class="export-btn-referensi" onclick="exportExcelPerCategory('referensi')"><i class="fa-solid fa-file-excel"></i> Referensi</button>
+  <button class="export-btn-pelamar" onclick="exportExcelPerCategory('pelamar')"><i class="fa-solid fa-file-excel"></i> Pelamar</button>
+  <button class="export-btn-blacklist" onclick="exportExcelPerCategory('blacklist')"><i class="fa-solid fa-file-excel"></i> Blacklist</button>
+</div>
+          </div>
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>NAMA & NIK</th>
+                <th>TIPE FORMULIR</th>
+                <th>WAKTU</th>
+                <th>STATUS</th>
+                <th>AKSI</th>
+              </tr>
+            </thead>
+            <tbody id="activityTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- â”€â”€ SETTINGS SECTION â”€â”€ -->
+      <section id="settingsSection" class="hidden">
+        <div class="settings-grid">
+          <!-- Notifikasi & Penampilan -->
+          <div class="settings-card">
+            <h3>🔔 Notifikasi & Penampilan</h3>
+            
+            <div class="setting-row">
+              <div>
+                <strong>Notifikasi Form</strong>
+                <p>Aktifkan notifikasi saat formulir baru disimpan.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="notifyToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Info Akun -->
+          <div class="settings-card">
+            <h3>👤 Informasi Akun</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Email</strong>
+                <p>Akun email yang digunakan untuk login.</p>
+              </div>
+              <span id="dispActiveEmail" style="padding:6px 14px;background:rgba(59,130,246,0.1);color:#3b82f6;border-radius:8px;font-size:0.85rem;font-weight:600;">-</span>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Role</strong>
+                <p>Hak akses yang dimiliki akun ini.</p>
+              </div>
+              <span
+                style="padding:6px 14px;background:rgba(30,142,107,0.15);color:var(--primary);border-radius:8px;font-size:0.85rem;font-weight:600;">Administrator</span>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Sinkronisasi Data</strong>
+                <p>Data formulir user disinkronkan tiap 5 detik.</p>
+              </div>
+              <span
+                style="padding:6px 14px;background:rgba(59,130,246,0.1);color:#3b82f6;border-radius:8px;font-size:0.82rem;font-weight:600;">
+                <i class="fa-solid fa-circle" style="font-size:7px;vertical-align:middle;margin-right:4px;"></i> Aktif
+              </span>
+            </div>
+          </div>
+
+          <!-- Danger Zone (Logout) -->
+          <div class="settings-card danger-card">
+            <h3><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;color:#f59e0b;"></i>Zona Bahaya</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Keluar dari Panel Admin</strong>
+                <p>Anda akan diarahkan kembali ke halaman login.</p>
+              </div>
+              <button class="logout-btn" onclick="doLogout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+              </button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Hapus Semua Data</strong>
+                <p>Hapus seluruh data formulir dari localStorage. Tindakan ini tidak bisa dibatalkan.</p>
+              </div>
+              <button class="logout-btn" onclick="clearAllData()">
+                <i class="fa-solid fa-trash"></i> Hapus Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Ganti Password -->
+          <div class="settings-card" id="changePasswordCard">
+            <h3><i class="fa-solid fa-key" style="margin-right:8px;color:var(--primary)"></i>Ganti Password</h3>
+            <div style="background:rgba(59,130,246,0.08);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;margin-top:16px;">
+              <i class="fa-solid fa-envelope" style="color:#3b82f6;"></i>
+              <div>
+                <div style="font-size:0.75rem;color:#888;font-weight:600;text-transform:uppercase;">Akun</div>
+                <div id="pwFormEmail" style="font-size:0.9rem;font-weight:600;color:#111;">-</div>
+              </div>
+            </div>
+            <div class="security-divider"></div>
+            <div class="security-form-group">
+              <label>Password Saat Ini</label>
+              <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;"><input type="password" id="currentPassword" placeholder="Masukkan password saat ini" style="flex:1;border:none;outline:none;background:transparent;padding:10px 12px;font-size:0.9rem;"><button type="button" onclick="togglePass('currentPassword',this)" style="background:none;border:none;border-left:1px solid #eee;cursor:pointer;color:#aaa;padding:0 12px;min-height:40px;display:flex;align-items:center;"><i class="fa-regular fa-eye"></i></button>
+              </div>
+            </div>
+            <div class="security-form-group">
+              <label>Password Baru</label>
+              <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;"><input type="password" id="newPassword" placeholder="Min. 8 karakter, huruf + angka + simbol" style="flex:1;border:none;outline:none;background:transparent;padding:10px 12px;font-size:0.9rem;"><button type="button" onclick="togglePass('newPassword',this)" style="background:none;border:none;border-left:1px solid #eee;cursor:pointer;color:#aaa;padding:0 12px;min-height:40px;display:flex;align-items:center;"><i class="fa-regular fa-eye"></i></button>
+              </div>
+            </div>
+            <div class="security-form-group">
+              <label>Konfirmasi Password Baru</label>
+              <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;"><input type="password" id="confirmPassword" placeholder="Ulangi password baru" style="flex:1;border:none;outline:none;background:transparent;padding:10px 12px;font-size:0.9rem;"><button type="button" onclick="togglePass('confirmPassword',this)" style="background:none;border:none;border-left:1px solid #eee;cursor:pointer;color:#aaa;padding:0 12px;min-height:40px;display:flex;align-items:center;"><i class="fa-regular fa-eye"></i></button>
+              </div>
+            </div>
+            <div id="passwordStrengthBar" style="height:6px;border-radius:4px;background:rgba(255,255,255,0.08);margin-bottom:12px;overflow:hidden;">
+              <div id="passwordStrengthFill" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s;"></div>
+            </div>
+            <div id="passwordStrengthLabel" style="font-size:0.75rem;color:var(--text-sub);margin-bottom:14px;"></div>
+            <button class="security-btn" onclick="handleChangePassword()">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Password Baru
+            </button>
+          </div>
+
+          <!-- Tambah Akun Admin -->
+<div class="settings-card" id="addAccountCard" style="margin-top:24px;">
+  <h3><i class="fa-solid fa-user-plus" style="margin-right:8px;color:var(--primary)"></i>Tambah Akun Admin</h3>
+  <div class="security-divider"></div>
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <label class="security-label" style="color:#111!important;">Username Baru</label>
+      <div class="security-input-wrap">
+        <i class="fa-solid fa-user" style="color:#111;"></i>
+        <input type="text" class="security-input" id="addUsername" placeholder="Masukkan username baru">
+      </div>
+    </div>
+    <div>
+      <label class="security-label" style="color:#111!important;">Email</label>
+      <div class="security-input-wrap">
+        <i class="fa-solid fa-envelope" style="color:#111;"></i>
+        <input type="email" class="security-input" id="addEmail" placeholder="Masukkan email admin">
+      </div>
+    </div>
+    <div>
+      <label class="security-label" style="color:#111!important;">Password</label>
+      <div style="position:relative;display:flex;align-items:center;background:transparent;border:1px solid var(--border,#2d3548);border-radius:10px;padding:0 12px;gap:8px;"><i class="fa-solid fa-lock" style="color:#111;flex-shrink:0;"></i><input type="password" class="security-input" id="addPassword" placeholder="Min. 8 karakter, huruf + angka + simbol" style="flex:1;min-width:0;border:none;background:transparent;outline:none;padding-right:36px;"><button type="button" onclick="var i=document.getElementById('addPassword');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';" style="background:none;border:none;cursor:pointer;padding:4px;color:#888;flex-shrink:0;"><i class="fa-solid fa-eye"></i></button></div>
+    </div>
+    <div>
+      <div style="margin-top:6px;margin-bottom:10px;">
+          <div style="height:5px;background:#e5e7eb;border-radius:999px;overflow:hidden;">
+            <div id="pwStrengthBar" style="height:100%;width:0%;border-radius:999px;transition:width 0.3s,background 0.3s;"></div>
+          </div>
+          <span id="pwStrengthLabel" style="font-size:0.75rem;font-weight:500;margin-top:3px;display:inline-block;"></span>
+        </div>
+        <label class="security-label" style="color:#111!important;">Konfirmasi Password</label>
+      <div style="position:relative;display:flex;align-items:center;background:transparent;border:1px solid var(--border,#2d3548);border-radius:10px;padding:0 12px;gap:8px;"><i class="fa-solid fa-lock" style="color:#111;flex-shrink:0;"></i><input type="password" class="security-input" id="addConfirmPassword" placeholder="Ulangi password" style="flex:1;min-width:0;border:none;background:transparent;outline:none;padding-right:36px;"><button type="button" onclick="var i=document.getElementById('addConfirmPassword');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';" style="background:none;border:none;cursor:pointer;padding:4px;color:#888;flex-shrink:0;"><i class="fa-solid fa-eye"></i></button></div>
+    </div>
+    <div id="newAdminStrengthBar" style="height:6px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;">
+      <div id="newAdminStrengthFill" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s;"></div>
+    </div>
+    <div id="newAdminStrengthLabel" style="font-size:0.75rem;color:var(--text-sub);margin-top:-8px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
+      <input type="checkbox" id="newAdminEnable2FA" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;">
+      <label for="newAdminEnable2FA" style="color:var(--text-main);font-size:0.9rem;cursor:pointer;">
+        <i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i>
+        Aktifkan 2FA untuk akun ini
+      </label>
+    </div>
+    <button class="security-btn" onclick="submitTambahAdmin()">
+      <i class="fa-solid fa-user-plus"></i> Daftarkan Akun Admin
+    </button>
+  </div>
+  <div id="adminAccountsList" style="margin-top:20px;"></div>
+</div>
+
+<!-- Manajemen Akun Admin -->
+          <div class="settings-card" id="adminUserListSection" style="margin-bottom:24px;">
+            <h3><i class="fa-solid fa-users-gear" style="margin-right:8px;color:var(--primary)"></i>Manajemen Akun Admin</h3>
+            <p style="color:var(--text-sub);font-size:0.85rem;margin-bottom:16px;">Daftar semua akun admin terdaftar. Anda bisa memblokir atau menghapus akun lain.</p>
+            <div id="adminUserListContainer" style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                <thead>
+                  <tr style="background:rgba(183,28,28,0.08);text-align:left;">
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Username</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Email</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Terdaftar</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">2FA</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Status</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUserListBody">
+                  <tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-sub);">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <button onclick="loadAdminUserList()" style="margin-top:14px;padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;"><i class="fa-solid fa-rotate"></i> Refresh Daftar</button>
+          </div>
+
+          <!-- Riwayat Login Admin -->
+          <div class="settings-card" id="loginHistorySection" style="margin-bottom:24px;">
+            <h3><i class="fa-solid fa-clock-rotate-left" style="margin-right:8px;color:var(--primary)"></i>Riwayat Login Admin</h3>
+            <p style="color:var(--text-sub);font-size:0.85rem;margin-bottom:16px;">100 login terakhir — username, email, metode login, dan waktu.</p>
+            <div id="loginHistoryContainer" style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                <thead>
+                  <tr style="background:rgba(183,28,28,0.08);text-align:left;">
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Username</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Email</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Metode</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">Tanggal &amp; Jam</th>
+                    <th style="padding:10px 12px;border-bottom:2px solid #f3f4f6;">IP</th>
+                  </tr>
+                </thead>
+                <tbody id="loginHistoryBody">
+                  <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-sub);">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <button onclick="loadLoginHistory()" style="margin-top:14px;padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;"><i class="fa-solid fa-rotate"></i> Refresh Riwayat</button>
+          </div>
+<!-- Autentikasi 2 Faktor (2FA) -->
+          <div class="settings-card" id="twoFACard">
+            <h3><i class="fa-solid fa-shield-halved" style="margin-right:8px;color:var(--primary)"></i>Autentikasi 2 Faktor (2FA)</h3>
+            <div class="security-divider"></div>
+
+            <div class="setting-row" style="margin-bottom:16px;">
+              <div>
+                <strong>Status 2FA</strong>
+                <p>Lindungi akun dengan kode OTP saat login.</p>
+              </div>
+              <span id="twoFAStatus" class="security-status-off">
+                <i class="fa-solid fa-circle-xmark"></i> Nonaktif
+              </span>
+            </div>
+
+            <!-- Setup 2FA -->
+            <div id=
+"
+twoFASetupSection
+"
+ style=
+"
+width:100%;padding-top:16px;
+"
+>
+              <div style="display:flex;flex-direction:row;gap:0;align-items:flex-start;width:100%;">
+                <!-- Kiri: QR + Input -->
+                <div style="flex:1;min-width:0;padding-right:24px;">
+                  <p style="font-size:0.85rem;margin-bottom:12px;color:var(--text-sub)">Scan QR code ini dengan aplikasi autentikator (Google Authenticator / Authy)</p>
+                  <div id="twoFAQrCode" style="width:160px;height:160px;background:#fff;border:1px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;">
+                    <span style="font-size:0.65rem;text-align:center;color:#666;padding:4px;">QR Code tampil setelah klik Aktifkan</span>
+                  </div>
+                  <p style="font-size:0.75rem;color:var(--text-sub);margin-bottom:4px;">Atau masukkan kode manual:</p>
+                  <code id="twoFASecret" style="font-size:0.8rem;background:rgba(0,0,0,0.05);padding:6px 12px;border-radius:6px;letter-spacing:2px;display:inline-block;margin-bottom:14px;">— klik Aktifkan untuk generate —</code>
+                  <p style="font-size:0.82rem;margin-bottom:8px;">Masukkan kode 6-digit dari aplikasi untuk konfirmasi:</p>
+                  <div class="otp-verify-grid" id="twoFAVerifyGrid" style="display:flex;flex-direction:row;gap:8px;margin-bottom:12px;justify-content:flex-start;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                    <input type="text" maxlength="1" inputmode="numeric" class="tfa-otp" style="width:50px;height:58px;text-align:center;font-size:1.4rem;font-weight:700;border:none;border-bottom:3px solid #c0392b;border-radius:0;background:transparent;color:#1a0000;outline:none;">
+                  </div>
+                  <div style="display:flex;gap:10px;">
+                    <button class="security-btn" onclick="generateQRCode2FA()" id="btn2FAGenerate" style="background:linear-gradient(135deg,#1d4ed8,#2563eb);margin-right:8px;"><i class="fa-solid fa-qrcode"></i> Generate QR</button><button class="security-btn" onclick="saveOrGenerate2FA()" id="btn2FAVerify"><i class="fa-solid fa-floppy-disk"></i> Simpan Kode</button>
+                  </div>
+                </div>
+                <!-- Garis Pemisah -->
+                <div style="width:1px;background:rgba(229,57,53,0.25);align-self:stretch;margin:0 4px;flex-shrink:0;"></div>
+                <!-- Kanan: App Authenticator -->
+                <div style="width:280px;flex-shrink:0;background:#fff8f8;border-radius:14px;padding:20px;border:1px solid rgba(229,57,53,0.15);margin-left:20px;">
+                  <h4 style="color:var(--primary);margin-bottom:16px;font-size:0.95rem;font-weight:700;"><i class="fa-solid fa-mobile-screen-button" style="margin-right:8px;"></i>Aplikasi Authenticator</h4>
+                  <div style="display:flex;flex-direction:column;gap:12px;">
+                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #eee;text-decoration:none;color:#1a0000;">
+                      <div style="font-size:1.4rem;width:36px;height:36px;background:#4285f4;border-radius:8px;display:flex;align-items:center;justify-content:center;">🔑</div>
+                      <div><div style="font-weight:700;font-size:0.85rem;">Google Authenticator</div><div style="font-size:0.75rem;color:#888;">Android & iOS</div></div>
+                      <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto;color:var(--primary);font-size:0.75rem;"></i>
+                    </a>
+                    <a href="https://authy.com/download/" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #eee;text-decoration:none;color:#1a0000;">
+                      <div style="font-size:1.4rem;width:36px;height:36px;background:#d93025;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔐</div>
+                      <div><div style="font-weight:700;font-size:0.85rem;">Authy</div><div style="font-size:0.75rem;color:#888;">Android, iOS & Desktop</div></div>
+                      <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto;color:var(--primary);font-size:0.75rem;"></i>
+                    </a>
+                  </div>
+                  <div style="margin-top:16px;padding:10px;background:rgba(229,57,53,0.08);border-radius:8px;font-size:0.78rem;color:var(--primary);line-height:1.5;">
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Simpan kode manual sebagai backup jika HP hilang!
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Disable 2FA (tampil kalau sudah aktif) -->
+            <div id="twoFADisableSection" style="display:none">
+              <div style="display:flex !important;flex-direction:row !important;gap:24px;align-items:flex-start;width:100%;"><div style="flex:1;min-width:0;padding-right:24px;">
+                <p style="font-size:0.85rem;margin-bottom:10px;">
+                  <i class="fa-solid fa-shield-check" style="color:#34d399"></i>
+                  2FA aktif untuk akun <strong id="twoFAUsername">admin</strong>.
+                </p>
+                <button class="security-btn danger" onclick="disableTwoFA()">
+                  <i class="fa-solid fa-shield-xmark"></i> Nonaktifkan 2FA
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- â”€â”€ MODAL DETAIL FORMULIR â”€â”€ -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle">Detail Formulir</h3>
+        <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div class="modal-identity">
+        <div class="modal-identity-top">
+          <div class="modal-avatar" id="modalAvatar">?</div>
+          <div>
+            <div class="modal-name" id="modalName">-</div>
+            <div class="modal-nik" id="modalNik">-</div>
+          </div>
+        </div>
+        <div class="modal-meta">
+          <div class="modal-meta-item">
+            <i class="fa-solid fa-clock" style="font-size:11px"></i>
+            <span id="modalTime">-</span>
+          </div>
+          <span class="modal-status-badge status-review" id="modalStatus">-</span>
+        </div>
+      </div>
+
+      <div class="modal-fields">
+        <div class="modal-fields-title">DETAIL DATA FORMULIR</div>
+        <div id="modalFields"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-close" onclick="closeDetailModal()">
+          <i class="fa-solid fa-xmark"></i> Tutup
+        </button>
+        <button class="modal-btn modal-btn-approve" onclick="approveFromModal()">
+          <i class="fa-solid fa-check"></i> Tandai Lengkap
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- â”€â”€ MODAL UBAH STATUS â”€â”€ -->
+  <div class="modal-overlay" id="statusModal">
+    <div class="status-modal-box">
+      <h3>Ubah Status</h3>
+      <p id="statusModalName" style="color:var(--primary);font-weight:600;margin-bottom:4px;font-size:0.95rem;"></p>
+      <p>Pilih status baru untuk formulir ini:</p>
+      <select class="status-select" id="statusSelect">
+        <option value="Baru">Baru</option>
+        <option value="Review">Review</option>
+        <option value="Lengkap">Lengkap</option>
+        <option value="Disetujui">Disetujui</option>
+        <option value="Ditolak">Ditolak</option>
+      </select>
+      <div class="status-modal-actions">
+        <button class="modal-btn modal-btn-close" onclick="closeStatusModal()">Batal</button>
+        <button class="modal-btn modal-btn-approve" onclick="saveStatus()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+window.__INDO5_API__ = {
+    usePostgres: true,
+    baseUrl: window.location.origin,
+    adminKey: "indo5_admin_2026"
+};
+</script>
+<script src="admin_dashboard.js?v=4"></script>
+
+<script>
+// Fix email display
+(function() {
+    function updateEmail() {
+        var email = localStorage.getItem("admin_email") || "-";
+        var el = document.getElementById("pwFormEmail");
+        if (el) el.textContent = email;
+        var el2 = document.getElementById("dispActiveEmail");
+        if (el2) el2.textContent = email;
+    }
+    updateEmail();
+    setInterval(updateEmail, 1000);
+    document.addEventListener("DOMContentLoaded", updateEmail);
+})();
+
+// Fix togglePass
+function togglePass(id, btn) {
+    var input = document.getElementById(id);
+    if (!input) return;
+    if (input.type === "password") {
+        input.type = "text";
+        btn.innerHTML = "<i class=\"fa-solid fa-eye-slash\"></i>";
+    } else {
+        input.type = "password";
+        btn.innerHTML = "<i class=\"fa-solid fa-eye\"></i>";
+    }
+}
+
+// openPDF
+function openPDF(filename) {
+    alert("File: " + filename.replace("[PDF] ", ""));
+}
+
+// Anti back button
+(function() {
+    history.pushState(null, null, location.href);
+    window.addEventListener("popstate", function() {
+        var isLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+        if (!isLoggedIn) {
+            history.pushState(null, null, location.href);
+            window.location.replace("admin_login.html");
+        } else {
+            history.pushState(null, null, location.href);
+        }
+    });
+})();
+</script>
+<script src="/dashboard_fix.js?v=7"></script></body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

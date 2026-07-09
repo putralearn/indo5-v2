@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PT Indolima Perkasa</title>
+    <link rel="stylesheet" href="desainuser.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+
+    <!-- Dark/Light toggle -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Ganti tema">
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+    </button>
+
+    <div class="auth-wrapper">
+        <div class="auth-box">
+
+            <!-- Logo pojok kiri atas -->
+            <div class="logo-corner">
+                <img src="data:image/webp;base64,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"
+                    alt="Indonesia5 Communications">
+            </div>
+
+            <!-- Avatar -->
+            <div class="avatar-area">
+                <div class="avatar-circle">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                    </svg>
+                </div>
+            </div>
+
+            <h2>Login Form</h2>
+
+            <!-- Username -->
+            <div class="field-group">
+                <label for="username">Email</label>
+                <div class="input-wrap">
+                    <input type="email" id="username" placeholder="Enter Email">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="field-group">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" placeholder="Enter Password">
+                    <button class="eye-btn" type="button" onclick="togglePassword('password',this)"
+                        title="Tampilkan password">
+                        <svg id="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember me + Forgot -->
+            <div class="options-row">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe"> Remember me
+                </label>
+                <a href="#" class="forgot-link" onclick="openForgot(event)">Forgot password?</a>
+            </div>
+
+            <!-- Login Button -->
+            <button class="btn-main" onclick="login()">Login</button>
+
+            <!-- Divider -->
+            <div class="divider">atau login dengan</div>
+
+            <!-- Social Buttons -->
+            <div class="social-btns">
+                <button class="btn-social btn-google" onclick="loginGoogle()" style="max-width:220px;margin:0 auto">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                    </svg>
+                    Login dengan Google
+                </button>
+            </div>
+
+            <!-- Switch -->
+            <div class="switch-text">
+                Belum punya akun? <a href="registeruser.html">Register sekarang</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="forgotModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeForgot()">✕</button>
+
+            <!-- Step 1: Input WhatsApp langsung -->
+            <div id="stepPilih">
+                <h3>🔑 Lupa Password?</h3>
+                <p>Masukkan nomor WhatsApp kamu, kode OTP akan dikirim via WhatsApp.</p>
+                <div class="field-group">
+                    <label>Nomor WhatsApp</label>
+                    <div class="input-wrap">
+                        <input type="tel" id="forgotWA" placeholder="Contoh: 08123456789">
+                    </div>
+                </div>
+                <button class="btn-main" style="background:#25D366" onclick="kirimWA()">
+                    📱 Kirim Kode via WhatsApp
+                </button>
+            </div>
+
+            <!-- Step 3: Verifikasi OTP -->
+            <div id="stepOTP" style="display:none">
+                <h3>🔢 Masukkan Kode OTP</h3>
+                <p id="otpDesc">Masukkan kode 6 digit yang sudah dikirim.</p>
+                <div class="field-group">
+                    <label>Kode OTP</label>
+                    <div class="input-wrap">
+                        <input type="text" id="inputOTP" placeholder="Contoh: 123456" maxlength="6"
+                            style="letter-spacing:6px;font-size:1.2rem;text-align:center">
+                    </div>
+                </div>
+                <button class="btn-main" onclick="verifikasiOTP()">Verifikasi Kode</button>
+                <p style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--subtext)" id="otpTimer"></p>
+            </div>
+
+            <!-- Step 4: Ganti Password -->
+            <div id="stepGantiPW" style="display:none">
+                <h3>🔒 Buat Password Baru</h3>
+                <p>Masukkan password baru kamu.</p>
+                <div class="field-group">
+                    <label>Password Baru</label>
+                    <div class="input-wrap">
+                        <input type="password" id="newPW" placeholder="Minimal 6 karakter">
+                        <button class="eye-btn" type="button" onclick="togglePassword('newPW',this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Konfirmasi Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="confirmPW" placeholder="Ulangi password baru">
+                        <button class="eye-btn" type="button" onclick="togglePassword('confirmPW',this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn-main" onclick="simpanPasswordBaru()">Simpan Password Baru</button>
+            </div>
+
+            <!-- Step 5: Sukses -->
+            <div class="modal-success" id="forgotSuccess">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <p>Password berhasil diubah!<br>Silakan login dengan password baru kamu. 🎉</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── THEME ──
+        function applyTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('theme', t);
+            document.getElementById('iconMoon').style.display = t === 'dark' ? 'none' : 'block';
+            document.getElementById('iconSun').style.display = t === 'dark' ? 'block' : 'none';
+        }
+        function toggleTheme() {
+            applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        }
+        applyTheme(localStorage.getItem('theme') || 'light');
+
+        // ── EYE TOGGLE ──
+        function togglePassword(id, btn) {
+            const el = document.getElementById(id);
+            const hide = el.type === 'password';
+            el.type = hide ? 'text' : 'password';
+            btn.innerHTML = hide
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        }
+
+        // ── TOAST ──
+        function showToast(msg, dur = 2800) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), dur);
+        }
+
+        // ── FORGOT PASSWORD ──
+        let otpCode = '';
+        let otpExpiry = 0;
+        let timerInterval = null;
+
+        function showStep(step) {
+            ['stepPilih', 'stepWA', 'stepEmail', 'stepOTP', 'stepGantiPW', 'forgotSuccess'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            if (step) document.getElementById(step).style.display = 'block';
+        }
+
+        function openForgot(e) {
+            e.preventDefault();
+            document.getElementById('forgotModal').classList.add('active');
+            showStep('stepPilih');
+        }
+
+        function closeForgot() {
+            document.getElementById('forgotModal').classList.remove('active');
+            clearInterval(timerInterval);
+            otpCode = '';
+        }
+
+
+
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function startTimer() {
+            let sisa = 300; // 5 menit
+            otpExpiry = Date.now() + sisa * 1000;
+            clearInterval(timerInterval);
+            const el = document.getElementById('otpTimer');
+            timerInterval = setInterval(() => {
+                sisa = Math.round((otpExpiry - Date.now()) / 1000);
+                if (sisa <= 0) {
+                    clearInterval(timerInterval);
+                    el.textContent = '⏰ Kode kadaluarsa. Ulangi proses.';
+                    otpCode = '';
+                } else {
+                    const m = Math.floor(sisa / 60), s = sisa % 60;
+                    el.textContent = `Kode berlaku: ${m}:${s < 10 ? '0' + s : s}`;
+                }
+            }, 1000);
+        }
+
+        // ── KIRIM VIA WHATSAPP ──
+        function kirimWA() {
+            let no = document.getElementById('forgotWA').value.trim().replace(/\D/g, '');
+            if (!no || no.length < 9) { showToast('⚠️ Masukkan nomor WhatsApp yang valid'); return; }
+            if (no.startsWith('0')) no = '62' + no.slice(1);
+            else if (!no.startsWith('62')) no = '62' + no;
+
+            otpCode = generateOTP();
+            const pesan = encodeURIComponent(
+                `Halo! Kode OTP reset password PT Indolima Perkasa kamu adalah:\n\n` +
+                `*${otpCode}*\n\nKode berlaku 5 menit. Jangan berikan ke siapapun!`
+            );
+            window.open(`https://wa.me/${no}?text=${pesan}`, '_blank');
+            document.getElementById('otpDesc').textContent = 'Kode OTP sudah dikirim ke WhatsApp kamu.';
+            showStep('stepOTP');
+            startTimer();
+        }
+
+
+
+        // ── VERIFIKASI OTP ──
+        function verifikasiOTP() {
+            const input = document.getElementById('inputOTP').value.trim();
+            if (!otpCode) { showToast('⏰ Kode sudah kadaluarsa, ulangi proses'); return; }
+            if (Date.now() > otpExpiry) { showToast('⏰ Kode sudah kadaluarsa, ulangi proses'); return; }
+            if (input === otpCode) {
+                clearInterval(timerInterval);
+                showStep('stepGantiPW');
+            } else {
+                showToast('❌ Kode OTP salah, coba lagi!');
+                document.getElementById('inputOTP').style.border = '2px solid #c62828';
+                setTimeout(() => document.getElementById('inputOTP').style.border = '', 1500);
+            }
+        }
+
+        // ── SIMPAN PASSWORD BARU ──
+        function simpanPasswordBaru() {
+            const pw = document.getElementById('newPW').value;
+            const pw2 = document.getElementById('confirmPW').value;
+            if (!pw || pw.length < 6) { showToast('⚠️ Password minimal 6 karakter'); return; }
+            if (pw !== pw2) { showToast('❌ Password tidak cocok'); return; }
+            localStorage.setItem('userPass', pw);
+            showStep('forgotSuccess');
+            setTimeout(closeForgot, 3000);
+        }
+
+        document.getElementById('forgotModal').addEventListener('click', function (e) { if (e.target === this) closeForgot(); });
+
+        // ── GOOGLE LOGIN (Metode Popup - lebih reliable di localhost) ──
+        // ⚠️ Ganti dengan Client ID kamu dari https://console.cloud.google.com
+        const GOOGLE_CLIENT_ID = '128118657440-lrrjbbvq1u90unhflgk8ftbuo6eol0o5.apps.googleusercontent.com';
+
+                function loginGoogle() {
+            google.accounts.oauth2.initTokenClient({
+                client_id: '128118657440-lrrjbbvq1u90unhflgk8ftbuo6eol0o5.apps.googleusercontent.com',
+                scope: 'openid email profile',
+                callback: async (response) => {
+                    if (response.error) { showToast('Login Google gagal!'); return; }
+                    // Ambil info user dari Google
+                    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                        headers: { Authorization: 'Bearer ' + response.access_token }
+                    });
+                    const user = await res.json();
+                    // Simpan session
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userName', user.name);
+                    localStorage.setItem('userEmail', user.email);
+                    localStorage.setItem('userPhoto', user.picture);
+                    showToast('Login berhasil! Halo, ' + user.name);
+                    setTimeout(() => { window.location.href = '/dashboard.html'; }, 1000);
+                }
+            }).requestAccessToken();
+        }
+
+
+    </script>
+    <script src="user.js"></script>
+</body>
+
+</html>
+

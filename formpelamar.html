@@ -1,0 +1,384 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dashboard - PT Indolima Perkasa</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .dashboard-hero {
+            background: linear-gradient(135deg, #b71c1c 0%, #e53935 45%, #ef9a9a 100%);
+            padding: 0;
+            text-align: left;
+            color: #fff;
+            position: relative;
+            min-height: 110px;
+            display: flex;
+            align-items: flex-end;
+        }
+        .dashboard-hero img { width:300px; max-width:100%; object-fit:contain; margin:0; padding:0; height:auto; }
+        .dashboard-hero h1 { display: none; }
+        .dashboard-hero p { display: none; }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        @media(max-width:500px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .menu-card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 28px 24px;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(139, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .menu-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+        }
+
+        .menu-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .menu-card p {
+            font-size: 0.78rem;
+            color: var(--subtext);
+            line-height: 1.5;
+        }
+
+        .menu-arrow {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .dash-topbar {
+            background: var(--primary);
+            padding: 0 24px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .dash-topbar span {
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+
+                        <div class="dash-topbar" style="background:#b71c1c;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;"><a href="/dashboard.html" style="display:flex;align-items:center;gap:6px;padding:0 40px;height:36px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;text-decoration:none;font-size:0.88rem;font-weight:700;border:2px solid rgba(255,255,255,0.4);backdrop-filter:blur(6px);white-space:nowrap;">← Dashboard</a><button class="theme-btn" onclick="toggleTheme()" title="Ganti tema"><svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div></div>
+    </div>
+
+                                                                                <div class="dashboard-hero" style="position:relative;background:linear-gradient(135deg,#b71c1c 0%,#e53935 45%,#ef9a9a 100%);min-height:180px;display:flex;align-items:center;padding:0;overflow:hidden;"><img src="/logo_transparent.png" alt="Logo"></div></div>
+
+    <div class="container">
+        <div class="form-header">
+            <h1>💼 Formulir Pelamar Indo5</h1>
+            <p>Isi data diri kamu untuk melamar posisi di PT Indolima Perkasa. Semua field bertanda * wajib diisi.</p>
+        </div>
+        <form class="form-card" id="form-pelamar" onsubmit="event.preventDefault();submitForm(event)" onsubmit="event.preventDefault();return false;">
+
+            <div class="section-label">Data Diri Pelamar</div>
+            <div class="grid-2">
+                <div class="field"><label>Nama Lengkap <span class="req">*</span></label><input type="text" name="nama"
+                        required placeholder="Nama lengkap"></div>
+                <div class="field"><label>Email <span class="req">*</span></label><input type="email" name="email"
+                        required placeholder="email@gmail.com" oninput="validateEmail(this)" onblur="validateEmail(this)"><p class="field-error" style="color:#e53935;font-size:0.78rem;margin-top:4px;display:none;"></p></div>
+            </div>
+            <div class="grid-2">
+                <div class="field"><label>Usia <span class="req">*</span></label><input type="number" name="usia"
+                        required min="17" max="60" placeholder="Usia"></div>
+                <div class="field"><label>No Telepon Aktif / WhatsApp <span class="req">*</span></label><input
+                        type="tel" name="telepon" required placeholder="08xxxxxxxxxx" inputmode="numeric" oninput="validateWa(this)" onblur="validateWa(this)"><p class="field-error" style="color:#e53935;font-size:0.78rem;margin-top:4px;display:none;"></p></div>
+            </div>
+            <div class="grid-2">
+                <div class="field"><label>Tinggi Badan (cm) <span class="req">*</span></label><input type="number"
+                        name="tinggi" required placeholder="contoh: 165"></div>
+                <div class="field"><label>Berat Badan (kg) <span class="req">*</span></label><input type="number"
+                        name="berat" required placeholder="contoh: 55"></div>
+            </div>
+            <div class="field"><label>Penempatan <span class="req">*</span></label>
+                <input type="text" name="penempatan" required placeholder="Tulis area penempatan yang diinginkan">
+            </div>
+
+            <div class="field"><label>Jenis Kelamin <span class="req">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="jk" value="Perempuan" required>
+                        Perempuan</label>
+                    <label class="radio-item"><input type="radio" name="jk" value="Laki-Laki"> Laki-Laki</label>
+                </div>
+            </div>
+            <div class="field"><label>Status Pelamar <span class="req">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="status" value="Fresh Graduate" required> Fresh
+                        Graduate</label>
+                    <label class="radio-item"><input type="radio" name="status" value="Berpengalaman">
+                        Berpengalaman</label>
+                </div>
+            </div>
+            <div class="field"><label>Pendidikan Terakhir <span class="req">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="pendidikan" value="SMA" required> SMA</label>
+                    <label class="radio-item"><input type="radio" name="pendidikan" value="Diploma 1"> Diploma 1</label>
+                    <label class="radio-item"><input type="radio" name="pendidikan" value="Diploma 3"> Diploma 3</label>
+                    <label class="radio-item"><input type="radio" name="pendidikan" value="Diploma 4/Sarjana 1"> Diploma
+                        4/Sarjana 1</label>
+                </div>
+            </div>
+
+            <div class="section-label">Posisi yang Dilamar</div>
+            <div class="field"><label>Posisi yang Akan Dilamar <span class="req">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-item"><input type="radio" name="posisi" value="SPG/SPB" required>
+                        SPG/SPB</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="SMD/MD"> SMD/MD</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Sales"> Sales</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Admin"> Admin</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Team Leader"> Team Leader</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Area Coordinator"> Area
+                        Coordinator</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Produksi"> Produksi</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="SPV"> SPV</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Brand Ambassador"> Brand
+                        Ambassador</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Medical Representative"> Medical
+                        Representative</label>
+                    <label class="radio-item"><input type="radio" name="posisi" value="Lainnya"> Lainnya</label>
+                </div>
+            </div>
+
+
+            <div class="field" id="field-posisi-lain" style="display:none"><label>Posisi Lain (Tidak Ada di Daftar)</label>
+                <input type="text" name="posisi_lain" id="posisi_lain" placeholder="Tulis posisi yang diinginkan">
+            </div>
+
+            <div class="section-label">Dokumen</div>
+            <div class="field"><label>Upload CV Format PDF <span class="req">*</span></label>
+                <div class="file-upload"><input type="file" name="cv" accept=".pdf" required>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <p>Upload CV (PDF)<br><small>Maks 10 MB</small></p>
+                    <div class="file-name"></div>
+                </div>
+            </div>
+            <div class="field"><label>Upload Foto Terbaru Full Badan <span class="req">*</span></label>
+                <div class="file-upload"><input type="file" name="foto_full" accept="image/*" required>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <p>Upload Foto Full Badan<br><small>Maks 10 MB</small></p>
+                    <div class="file-name"></div>
+                </div>
+            </div>
+
+            <div class="field"><label>Pengalaman Kerja</label>
+                <textarea name="pengalaman"
+                    placeholder="Ceritakan pengalaman kerja kamu sebelumnya (opsional)"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">📤 Kirim Lamaran</button>
+        </form>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>function applyTheme(t) { document.documentElement.setAttribute("data-theme", t); localStorage.setItem("theme", t); const m = document.getElementById("iconMoon"), s = document.getElementById("iconSun"); if (m) m.style.display = t === "dark" ? "none" : "block"; if (s) s.style.display = t === "dark" ? "block" : "none"; } function toggleTheme() { applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"); } applyTheme(localStorage.getItem("theme") || "light"); document.querySelectorAll(".file-upload input").forEach(inp => { inp.addEventListener("change", function () { const fn = this.closest(".file-upload").querySelector(".file-name"); if (fn) { fn.textContent = this.files[0] ? this.files[0].name : ""; fn.style.display = this.files[0] ? "block" : "none"; } }); }); function showToast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); }</script>
+
+    <div class="toast"></div>
+    <script src="/indo5-api-config.js"></script>
+    <script src="userform.js"></script>
+
+
+
+
+
+
+
+<script>
+function validateNik(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    const msg = input.nextElementSibling;
+    if (!msg) return;
+    const len = input.value.length;
+    if (len === 0) { msg.style.display = 'none'; return; }
+    msg.style.display = 'block';
+    if (len < 16) { msg.textContent = '⚠️ NIK kurang ' + (16-len) + ' angka lagi (harus 16 digit)'; msg.style.color = '#e53935'; }
+    else { msg.textContent = '✅ NIK valid 16 digit'; msg.style.color = '#2e7d32'; }
+}
+function validateWa(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    const msg = input.nextElementSibling;
+    if (!msg) return;
+    const v = input.value;
+    if (v.length === 0) { msg.style.display = 'none'; return; }
+    msg.style.display = 'block';
+    if (!v.startsWith('08')) { msg.textContent = '⚠️ No WhatsApp harus diawali 08 dan hanya boleh angka'; msg.style.color = '#e53935'; }
+    else if (v.length < 10) { msg.textContent = '⚠️ Terlalu pendek, minimal 10 angka'; msg.style.color = '#e53935'; }
+    else if (v.length > 13) { msg.textContent = '⚠️ Terlalu panjang, maksimal 13 angka'; msg.style.color = '#e53935'; }
+    else { msg.textContent = '✅ No WhatsApp valid'; msg.style.color = '#2e7d32'; }
+}
+function validateEmail(input) {
+    const msg = input.nextElementSibling;
+    if (!msg) return;
+    const v = input.value;
+    if (v.length === 0) { msg.style.display = 'none'; return; }
+    msg.style.display = 'block';
+    if (!v.endsWith('@gmail.com')) { msg.textContent = '⚠️ Email harus menggunakan @gmail.com'; msg.style.color = '#e53935'; }
+    else { msg.textContent = '✅ Email valid'; msg.style.color = '#2e7d32'; }
+}
+</script>
+<script>
+function submitForm(e) {
+    if (e) e.preventDefault();
+    const form = e ? e.target : document.querySelector('form');
+    const fd = new FormData(form);
+
+    const nama = fd.get('nama');
+    const email = fd.get('email');
+    if (!nama || !email) { showToast('Nama dan email wajib diisi!'); return; }
+    if (!email.endsWith('@gmail.com')) { showToast('Email harus menggunakan @gmail.com'); return; }
+
+    const apiBase = window.__INDO5_API__ ? window.__INDO5_API__.baseUrl : window.location.origin;
+    const btn = form.querySelector('.btn-submit');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Mengirim...'; }
+
+    fetch(apiBase + '/api/pelamar', {
+        method: 'POST',
+        body: fd
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast('✅ Lamaran berhasil dikirim! Terima kasih.');
+            setTimeout(() => form.reset(), 2000);
+        } else {
+            showToast('❌ ' + (data.message || 'Gagal mengirim lamaran'));
+        }
+        if (btn) { btn.disabled = false; btn.textContent = '📤 Kirim Lamaran'; }
+    })
+    .catch(err => {
+        showToast('❌ Gagal menghubungi server!');
+        if (btn) { btn.disabled = false; btn.textContent = '📤 Kirim Lamaran'; }
+        console.error(err);
+    });
+}
+</script>
+<script>
+document.querySelectorAll('input[name="posisi"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var fieldLain = document.getElementById('field-posisi-lain');
+        var inputLain = document.getElementById('posisi_lain');
+        if (this.value === 'Lainnya') {
+            fieldLain.style.display = 'block';
+            inputLain.required = true;
+        } else {
+            fieldLain.style.display = 'none';
+            inputLain.required = false;
+            inputLain.value = '';
+        }
+    });
+});
+</script>
+</body>
+
+</html>
+
+
+
+

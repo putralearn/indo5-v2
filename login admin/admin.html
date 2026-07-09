@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indo5 Admin — Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+    <style>
+.login-card {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 48px !important;
+    padding: 44px 40px !important;
+    box-shadow: 0 20px 60px rgba(100,0,0,0.2) !important;
+    max-width: 440px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+#step2 h3 {
+    font-size: 1.4rem !important;
+    font-weight: 800 !important;
+    color: #1a0000 !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+}
+#step2 > p {
+    font-size: 0.88rem !important;
+    color: #666 !important;
+    text-align: center !important;
+    margin-bottom: 16px !important;
+    line-height: 1.5 !important;
+}
+.otp-hint {
+    text-align: center !important;
+    font-size: 0.82rem !important;
+    color: #888 !important;
+    margin-bottom: 20px !important;
+    background: #fff5f5 !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    display: inline-block !important;
+    width: 100% !important;
+}
+.otp-hint strong { color: #e53935 !important; }
+.otp-grid {
+    display: flex !important;
+    gap: 10px !important;
+    justify-content: center !important;
+    margin: 0 auto 24px !important;
+}
+.otp-inp {
+    width: 48px !important;
+    height: 56px !important;
+    text-align: center !important;
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: #fafafa !important;
+    color: #1a0000 !important;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+}
+.otp-inp:focus {
+    border-color: #e53935 !important;
+    background: #fff !important;
+}
+.shield-icon {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 2.5rem;
+}
+</style>
+
+<style>
+.input-wrap { display:flex !important; align-items:center !important; }
+.input-wrap input { flex:1 !important; border:none !important; background:transparent !important; outline:none !important; }
+.input-wrap button { background:none !important; border:none !important; cursor:pointer !important; color:#aaa !important; font-size:1rem !important; padding:0 10px !important; flex-shrink:0 !important; }
+.input-wrap button:hover { color:#666 !important; }
+.input-wrap button i { color:inherit !important; }
+</style>
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-logo">
+            <img src="logo.png" alt="Indonesia5 Logo" style="width:200px;height:auto;background:#fff;border-radius:12px;padding:8px 16px;display:block;margin:0 auto;">
+            <p style="color:#fff;font-size:1rem;font-weight:600;text-align:center;margin-top:12px;">Management Login Dashboard Admin</p>
+        </div>
+
+        <div class="login-card">
+            <!-- Alert -->
+            <div class="alert-box alert-error" id="alertBox">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="alertMsg">—</span>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step active" id="step1">
+                <div class="form-group">
+                    <label>Email</label>
+                    <div class="input-wrap">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="contoh@admin.com" autocomplete="email" spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="admin" autocomplete="username" spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" style="flex:1;">
+                        <button type="button" onclick="var inp=document.getElementById('loginPassword');inp.type=inp.type==='password'?'text':'password';this.querySelector('i').className=inp.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';" style="background:none;border:none;cursor:pointer;padding:0 10px;flex-shrink:0;"><i class="fa-solid fa-eye" style="color:#999;"></i></button>
+                    </div>
+                </div>
+
+                <div class="lockout-timer" id="lockoutTimer"></div>
+
+                <button class="login-btn" id="btnStep1" onclick="handleStep1()">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Lanjutkan
+                </button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step" id="step2">
+                <div class="shield-icon">🛡️</div>
+                <h3>Verifikasi 2FA</h3>
+                <p>Masukkan kode 6 digit dari<br><strong>Google Authenticator / Authy</strong> di HP kamu</p>
+                <div class="otp-hint">
+                    ⏱️ Kode berlaku selama <strong id="otpCountdown">60</strong> detik
+                </div>
+
+                <div class="otp-grid" id="otpGrid">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                    <input type="text" maxlength="1" inputmode="numeric" class="otp-inp">
+                </div>
+
+                <button class="login-btn" id="btnStep2" onclick="handleStep2()" style="margin-top:20px;">
+                    <i class="fa-solid fa-shield-check"></i>
+                    Verifikasi & Masuk
+                </button>
+
+                <p style="text-align:center;margin-top:14px;font-size:0.82rem;color:var(--text-sub);">
+                    <a href="#" onclick="goBack()" style="color:var(--primary);text-decoration:none;">
+                        ← Kembali ke login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+window.__INDO5_API__ = {
+    usePostgres: true,
+    baseUrl: window.location.origin,
+    adminKey: "indo5_admin_2026"
+};
+</script>
+<script src="login.js?v=2"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
