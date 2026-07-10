@@ -63,31 +63,40 @@ async function register() {
 
 // ── LOGIN ──
 async function login() {
-    const username = document.getElementById('username')?.value.trim();
+    const emailWrap = document.getElementById('loginEmailWrap');
+    const isEmailMode = !emailWrap || emailWrap.style.display !== 'none';
+    const emailVal = document.getElementById('username')?.value.trim();
+    const phoneVal = document.getElementById('loginPhone')?.value.trim();
+    const identifier = isEmailMode ? emailVal : phoneVal;
     const pass = document.getElementById('password')?.value;
     const remember = document.getElementById('rememberMe')?.checked;
 
-    if (!username) { showToast('Username wajib diisi', 'error'); return; }
+    if (!identifier) { showToast(isEmailMode ? 'Email wajib diisi' : 'Nomor telepon wajib diisi', 'error'); return; }
     if (!pass) { showToast('Password wajib diisi', 'error'); return; }
+
+    const body = isEmailMode
+        ? { email: identifier, password: pass }
+        : { phone: identifier, password: pass };
 
     try {
         const res = await fetch(API_BASE + '/api/user/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password: pass })
+            body: JSON.stringify(body)
         });
         const data = await res.json();
         if (data.success) {
             localStorage.setItem('userLoggedIn', 'true');
             localStorage.setItem('userName', data.username);
             localStorage.setItem('userEmail', data.email || '');
+            localStorage.setItem('userPhone', data.phone || '');
             localStorage.setItem('userToken', data.token);
-            if (remember) localStorage.setItem('rememberUser', username);
+            if (remember) localStorage.setItem('rememberUser', identifier);
             else localStorage.removeItem('rememberUser');
             showToast('Login berhasil!', 'success');
             setTimeout(() => { window.location.href = '/dashboard.html'; }, 1200);
         } else {
-            showToast(data.message || 'Username atau password salah', 'error');
+            showToast(data.message || 'Email/nomor atau password salah', 'error');
         }
     } catch(e) {
         showToast('Gagal menghubungi server', 'error');
@@ -104,3 +113,22 @@ window.addEventListener('DOMContentLoaded', () => {
         if (rememberBox) rememberBox.checked = true;
     }
 });
+
+// ── LOGIN MODE TOGGLE ──
+function switchLoginMode(mode) {
+    const emailWrap = document.getElementById('loginEmailWrap');
+    const phoneWrap = document.getElementById('loginPhoneWrap');
+    const emailBtn = document.getElementById('loginToggleEmail');
+    const phoneBtn = document.getElementById('loginTogglePhone');
+    if (mode === 'email') {
+        if (emailWrap) emailWrap.style.display = '';
+        if (phoneWrap) phoneWrap.style.display = 'none';
+        if (emailBtn) { emailBtn.style.background = 'var(--primary,#b71c1c)'; emailBtn.style.color = '#fff'; emailBtn.style.borderColor = 'var(--primary,#b71c1c)'; }
+        if (phoneBtn) { phoneBtn.style.background = 'transparent'; phoneBtn.style.color = 'inherit'; phoneBtn.style.borderColor = '#ccc'; }
+    } else {
+        if (emailWrap) emailWrap.style.display = 'none';
+        if (phoneWrap) phoneWrap.style.display = '';
+        if (phoneBtn) { phoneBtn.style.background = 'var(--primary,#b71c1c)'; phoneBtn.style.color = '#fff'; phoneBtn.style.borderColor = 'var(--primary,#b71c1c)'; }
+        if (emailBtn) { emailBtn.style.background = 'transparent'; emailBtn.style.color = 'inherit'; emailBtn.style.borderColor = '#ccc'; }
+    }
+}

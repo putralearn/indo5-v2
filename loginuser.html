@@ -51,11 +51,24 @@
 
             <h2>Login Form</h2>
 
-            <!-- Username -->
+            <!-- Toggle Email / No. Telepon -->
             <div class="field-group">
-                <label for="username">Email</label>
-                <div class="input-wrap">
-                    <input type="email" id="username" placeholder="Enter Email">
+                <label>Email / No. Telepon</label>
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <button type="button" id="loginToggleEmail" onclick="switchLoginMode('email')"
+                        style="flex:1;padding:8px;border-radius:8px;border:2px solid #b71c1c;background:#b71c1c;color:#fff;font-weight:600;cursor:pointer;">
+                        Email
+                    </button>
+                    <button type="button" id="loginTogglePhone" onclick="switchLoginMode('phone')"
+                        style="flex:1;padding:8px;border-radius:8px;border:2px solid #ccc;background:transparent;color:inherit;font-weight:600;cursor:pointer;">
+                        No. Telepon
+                    </button>
+                </div>
+                <div class="input-wrap" id="loginEmailWrap">
+                    <input type="email" id="username" placeholder="Masukkan Email">
+                </div>
+                <div class="input-wrap" id="loginPhoneWrap" style="display:none;">
+                    <input type="tel" id="loginPhone" placeholder="Masukkan No. Telepon (08xxx)">
                 </div>
             </div>
 
