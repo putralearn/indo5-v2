@@ -129,6 +129,57 @@ app.post('/api/auth/admin/otp/verify', async (req, res) => {
     }
 });
 
+// ── USER REGISTER ──
+app.post('/api/user/register', async (req, res) => {
+    const { username, email, phone, password } = req.body;
+    if (!username || !password) return res.status(400).json({ success:false, message:'Username dan password wajib diisi' });
+    if (!email && !phone) return res.status(400).json({ success:false, message:'Email atau nomor telepon wajib diisi' });
+    try {
+        const cek = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+        if (cek.rows.length > 0) return res.status(409).json({ success:false, message:'Username sudah terdaftar' });
+        if (email) {
+            const cekEmail = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+            if (cekEmail.rows.length > 0) return res.status(409).json({ success:false, message:'Email sudah terdaftar' });
+        }
+        if (phone) {
+            const cekPhone = await pool.query('SELECT id FROM users WHERE phone = $1', [phone]);
+            if (cekPhone.rows.length > 0) return res.status(409).json({ success:false, message:'Nomor telepon sudah terdaftar' });
+        }
+        const hash = await bcrypt.hash(password, 10);
+        await pool.query('INSERT INTO users (username, email, phone, password_hash) VALUES ($1, $2, $3, $4)', [username, email || null, phone || null, hash]);
+        res.json({ success:true, message:'Registrasi berhasil!' });
+    } catch(e) {
+        console.error('[USER REGISTER ERROR]', e);
+        res.status(500).json({ success:false, message:'Server error: ' + e.message });
+    }
+});
+
+// ── USER LOGIN ──
+app.post('/api/user/login', async (req, res) => {
+    const { username, email, phone, password } = req.body;
+    try {
+        let result;
+        if (username) {
+            result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        } else if (email) {
+            result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        } else if (phone) {
+            result = await pool.query('SELECT * FROM users WHERE phone = $1', [phone]);
+        } else {
+            return res.status(400).json({ success:false, message:'Username, email, atau nomor telepon wajib diisi' });
+        }
+        if (result.rows.length === 0) return res.status(401).json({ success:false, message:'Akun tidak ditemukan' });
+        const user = result.rows[0];
+        const valid = await bcrypt.compare(password, user.password_hash);
+        if (!valid) return res.status(401).json({ success:false, message:'Password salah' });
+        const token = jwt.sign({ id:user.id, username:user.username, role:'user' }, JWT_SECRET, { expiresIn:'8h' });
+        res.json({ success:true, token, username:user.username, email:user.email, phone:user.phone });
+    } catch(e) {
+        console.error('[USER LOGIN ERROR]', e);
+        res.status(500).json({ success:false, message:'Server error: ' + e.message });
+    }
+});
+
 app.post('/api/admin/login', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ success:false, message:'Username dan password wajib diisi' });
