@@ -1,3 +1,21 @@
+
+// ── STATUS MAPPING (New/Pending/Done/Reject) ──
+window.__statusLabel = function(s) {
+    const map = {
+        'New': { label: 'New', bg: '#dbeafe', color: '#1d4ed8' },
+        'Pending': { label: 'Pending', bg: '#fef9c3', color: '#a16207' },
+        'Done': { label: 'Done', bg: '#dcfce7', color: '#15803d' },
+        'Reject': { label: 'Reject', bg: '#fee2e2', color: '#b91c1c' },
+        // Legacy support
+        'Baru': { label: 'New', bg: '#dbeafe', color: '#1d4ed8' },
+        'Review': { label: 'Pending', bg: '#fef9c3', color: '#a16207' },
+        'Lengkap': { label: 'Done', bg: '#dcfce7', color: '#15803d' },
+        'Disetujui': { label: 'Done', bg: '#dcfce7', color: '#15803d' },
+        'Ditolak': { label: 'Reject', bg: '#fee2e2', color: '#b91c1c' },
+        'Fresh Graduate': { label: 'New', bg: '#dbeafe', color: '#1d4ed8' },
+    };
+    return map[s] || { label: s || 'New', bg: '#f3f4f6', color: '#6b7280' };
+};
 ﻿// ============================================================
 //  admin_dashboard.js — Indo5 Admin Dashboard V3 (FIXED)
 //  Perbaikan: Custom confirm modal, hapus data, kredensial, 2FA

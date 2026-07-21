@@ -316,6 +316,22 @@ button#confirmCancelBtn, button#confirmOkBtn {
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
 </style>
+
+<style id="adminRevisiCSS">
+/* Status badge baru */
+.status-new { background:#dbeafe!important;color:#1d4ed8!important; }
+.status-pending { background:#fef9c3!important;color:#a16207!important; }
+.status-done { background:#dcfce7!important;color:#15803d!important; }
+.status-reject { background:#fee2e2!important;color:#b91c1c!important; }
+
+/* Row hover info */
+.activity-table tbody tr { cursor:pointer; transition:background 0.15s; }
+.activity-table tbody tr:hover { background:#fff5f5; }
+
+/* Info popup */
+#infoPopupOverlay { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+</style>
 </head>
 
 <body class="dark-theme">
@@ -774,11 +790,10 @@ width:100%;padding-top:16px;
       <p id="statusModalName" style="color:var(--primary);font-weight:600;margin-bottom:4px;font-size:0.95rem;"></p>
       <p>Pilih status baru untuk formulir ini:</p>
       <select class="status-select" id="statusSelect">
-        <option value="Baru">Baru</option>
-        <option value="Review">Review</option>
-        <option value="Lengkap">Lengkap</option>
-        <option value="Disetujui">Disetujui</option>
-        <option value="Ditolak">Ditolak</option>
+        <option value="New">New</option>
+        <option value="Pending">Pending</option>
+        <option value="Done">Done</option>
+        <option value="Reject">Reject</option>
       </select>
       <div class="status-modal-actions">
         <button class="modal-btn modal-btn-close" onclick="closeStatusModal()">Batal</button>
@@ -843,7 +858,20 @@ function openPDF(filename) {
     });
 })();
 </script>
-<script src="/dashboard_fix.js?v=7"></script></body>
+<script src="/dashboard_fix.js?v=7"></script>
+<script id="rowClickPatch">
+document.addEventListener('click', function(e) {
+    const row = e.target.closest('#activityTableBody tr');
+    if (!row) return;
+    // Jangan trigger kalau klik tombol aksi
+    if (e.target.closest('button') || e.target.closest('a')) return;
+    const idx = row.getAttribute('data-idx');
+    if (idx !== null && window.dashboardData && window.dashboardData[idx]) {
+        window.showInfoPopup && window.showInfoPopup(window.dashboardData[idx]);
+    }
+});
+</script>
+</body>
 </html>
 
 

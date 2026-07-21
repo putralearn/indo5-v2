@@ -1,3 +1,96 @@
+
+// ══ POIN 2: Info popup (Nama Proyek, No KK, No KTP) ══
+window.showInfoPopup = function(item) {
+    const existing = document.getElementById('infoPopupOverlay');
+    if (existing) existing.remove();
+
+    const data = item.data || {};
+    const namaProyek = data.project || data.nama_proyek || data.proyek || '-';
+    const noKK = data.nomor_kk || data.no_kk || data.kk || '-';
+    const noKTP = data.nik || item.nik || '-';
+    const email = data.email || item.email || '-';
+    const telp = data.telepon || data.phone || item.phone || '-';
+    const nama = item.name || item.nama || '-';
+
+    // Status badge
+    const statusInfo = window.__statusLabel ? window.__statusLabel(item.status) : { label: item.status, bg: '#f3f4f6', color: '#6b7280' };
+
+    // ══ POIN 4: Format email & telp sebagai link ══
+    const emailLink = email !== '-'
+        ? `<a href="mailto:${email}" style="color:#b71c1c;text-decoration:none;font-weight:600;" title="Klik untuk kirim email">${email} ✉️</a>`
+        : '-';
+    const telpLink = telp !== '-'
+        ? `<a href="https://wa.me/${telp.replace(/[^0-9]/g,'')}" target="_blank" style="color:#25d366;text-decoration:none;font-weight:600;" title="Klik untuk chat WhatsApp">${telp} 📱</a>`
+        : '-';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'infoPopupOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:16px;padding:28px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative;">
+            <button onclick="document.getElementById('infoPopupOverlay').remove()"
+                style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#666;">✕</button>
+            
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+                <div style="width:48px;height:48px;border-radius:50%;background:#b71c1c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;">
+                    ${(nama[0]||'?').toUpperCase()}
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:1.1rem;color:#111;">${nama}</div>
+                    <span style="padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;background:${statusInfo.bg};color:${statusInfo.color};">
+                        ${statusInfo.label}
+                    </span>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid #f0f0f0;padding-top:16px;">
+                <p style="margin:0 0 4px;font-size:0.75rem;color:#999;text-transform:uppercase;letter-spacing:0.05em;">Hubungi User</p>
+                
+                <div style="background:#f9fafb;border-radius:10px;padding:14px;margin-bottom:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                        <span style="font-size:1.2rem;">✉️</span>
+                        <div>
+                            <div style="font-size:0.75rem;color:#999;margin-bottom:2px;">Email</div>
+                            <div style="font-size:0.9rem;">${emailLink}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:1.2rem;">📱</span>
+                        <div>
+                            <div style="font-size:0.75rem;color:#999;margin-bottom:2px;">WhatsApp / Telepon</div>
+                            <div style="font-size:0.9rem;">${telpLink}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin:0 0 8px;font-size:0.75rem;color:#999;text-transform:uppercase;letter-spacing:0.05em;">Identitas</p>
+                <div style="display:grid;gap:8px;">
+                    <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#f9fafb;border-radius:8px;">
+                        <span style="font-size:0.85rem;color:#666;">No. KTP / NIK</span>
+                        <span style="font-size:0.85rem;font-weight:600;color:#111;">${noKTP}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#f9fafb;border-radius:8px;">
+                        <span style="font-size:0.85rem;color:#666;">No. KK</span>
+                        <span style="font-size:0.85rem;font-weight:600;color:#111;">${noKK}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#f9fafb;border-radius:8px;">
+                        <span style="font-size:0.85rem;color:#666;">Nama Proyek</span>
+                        <span style="font-size:0.85rem;font-weight:600;color:#111;">${namaProyek}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+};
+
+// ══ Update render tabel: badge status pakai __statusLabel + klik baris buka popup ══
+const _origRender = window.renderTable;
+window._patchTableRendered = false;
 // 
 // DASHBOARD FIX - Tambah di akhir admin_dashboard.js
 // 
