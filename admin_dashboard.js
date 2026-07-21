@@ -368,7 +368,7 @@ function renderTable(query = '') {
             </td>
             <td><span class="type-badge" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">${item.type || '-'}</span></td>
             <td style="color:var(--text-sub);font-size:0.9rem">${item.time || '-'}</td>
-            <td><span class="status ${statusClass(item.status)}">${item.status || '-'}</span></td>
+            <td>${window._renderStatusBadge ? window._renderStatusBadge(item.status) : '<span class="type-badge">' + (item.status||'New') + '</span>'}</td>
             <td>
                 <div style="display:flex;gap:8px;">
                     <button class="action-btn btn-detail" onclick="openDetailModal(${realIdx})">
@@ -481,7 +481,7 @@ window.openStatusModal = (idx) => {
     if (!item) return;
     currentDetailIdx = idx;
     document.getElementById('statusModalName').innerText = item.name;
-    document.getElementById('statusSelect').value = item.status || 'Review';
+    document.getElementById('statusSelect').value = item.status || 'New';
     document.getElementById('statusModal').classList.add('show');
     document.body.style.overflow = 'hidden';
 };

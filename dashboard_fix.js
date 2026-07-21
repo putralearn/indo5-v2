@@ -1,4 +1,22 @@
 
+// ── STATUS BADGE RENDERER (selalu pakai label terbaru) ──
+window._renderStatusBadge = function(status) {
+    var map = {
+        'New':     { label: 'New',     bg: '#dbeafe', color: '#1d4ed8' },
+        'Pending': { label: 'Pending', bg: '#fef9c3', color: '#a16207' },
+        'Done':    { label: 'Done',    bg: '#dcfce7', color: '#15803d' },
+        'Reject':  { label: 'Reject',  bg: '#fee2e2', color: '#b91c1c' },
+        'Baru':    { label: 'New',     bg: '#dbeafe', color: '#1d4ed8' },
+        'Review':  { label: 'Pending', bg: '#fef9c3', color: '#a16207' },
+        'Lengkap': { label: 'Done',    bg: '#dcfce7', color: '#15803d' },
+        'Disetujui':{ label: 'Done',   bg: '#dcfce7', color: '#15803d' },
+        'Ditolak': { label: 'Reject',  bg: '#fee2e2', color: '#b91c1c' },
+        'Fresh Graduate': { label: 'New', bg: '#dbeafe', color: '#1d4ed8' },
+    };
+    var s = map[status] || { label: status || 'New', bg: '#f3f4f6', color: '#6b7280' };
+    return '<span class="type-badge" style="background:' + s.bg + ';color:' + s.color + ';font-weight:700;padding:3px 10px;border-radius:20px;font-size:0.78rem;">' + s.label + '</span>';
+};
+
 // ══ POIN 2: Info popup (Nama Proyek, No KK, No KTP) ══
 window.showInfoPopup = function(item) {
     const existing = document.getElementById('infoPopupOverlay');
@@ -625,7 +643,7 @@ window.clearAllData = function() {
 
 async function _doDeleteAll(filterType) {
     try {
-        var url = _getApiBase() + '/api/submissions' + (filterType ? '?type=' + encodeURIComponent(filterType) : '');
+        var url = _getApiBase() + '/api/submissions' + (filterType ? '?type=' + encodeURIComponent(filterType) : '') + (filterType ? '&' : '?') + '_t=' + Date.now();
         var res = await fetch(url, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + _getToken() }
