@@ -1,5 +1,6 @@
 require('dotenv').config();
-﻿const express = require('express');
+
+const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
@@ -9,58 +10,178 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
+
+app.use(cors({
+    origin: [
+        "https://avid-widget-revoke.ngrok-free.dev"
+    ],
+    methods: [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+    ],
+    credentials: true
+}));
+
+app.use(express.json({
+    limit: '50mb'
+}));
+
+app.use(express.urlencoded({
+    extended: true,
+    limit: '50mb'
+}));
+
 const PORT = 3000;
 const JWT_SECRET = 'indo5_secret_key_2024';
-const ROOT = 'C:\\laragon\\www\\indo5';
+const ROOT = process.platform === 'win32' ? 'C:\\laragon\\www\\indo5' : '/mnt/c/laragon/www/indo5';
 
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const pool = process.env.DATABASE_URL
-    ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
-    : new Pool({ user: process.env.DB_USER || 'postgres', host: process.env.DB_HOST || 'localhost', database: process.env.DB_NAME || 'indo5_admin', password: process.env.DB_PASSWORD || 'postgres', port: parseInt(process.env.DB_PORT || '5432') });
+    ? new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false
+        }
+    })
+    : new Pool({
+        user: process.env.DB_USER || 'postgres',
+        host: process.env.DB_HOST || 'localhost',
+        database: process.env.DB_NAME || 'indo5_admin',
+        password: process.env.DB_PASSWORD || 'postgres',
+        port: parseInt(process.env.DB_PORT || '5432')
+    });
+
 
 app.use(express.static(ROOT));
-app.use('/uploads', express.static(path.join(ROOT, 'uploads')));
+
+app.use('/uploads',
+    express.static(path.join(ROOT, 'uploads'))
+);
+
+
+// ==========================
+// UPLOAD FOTO
+// ==========================
 
 const uploadFoto = multer({
     storage: multer.diskStorage({
-        destination: (req, file, cb) => cb(null, path.join(ROOT, 'uploads', 'foto')),
+        destination: (req, file, cb) => {
+            cb(
+                null,
+                path.join(ROOT, 'uploads', 'foto')
+            );
+        },
+
         filename: (req, file, cb) => {
-            const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, unique + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+            const unique =
+                Date.now() + '-' +
+                Math.round(Math.random() * 1e9);
+
+            cb(
+                null,
+                unique + '-' +
+                file.originalname.replace(
+                    /[^a-zA-Z0-9.\-_]/g,
+                    '_'
+                )
+            );
         }
     }),
-    limits: { fileSize: 25 * 1024 * 1024 },
+
+    limits: {
+        fileSize: 25 * 1024 * 1024
+    },
+
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('File harus berupa gambar'));
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('File harus berupa gambar'));
+        }
     }
 });
 
+
+// ==========================
+// UPLOAD CV
+// ==========================
+
 const uploadCV = multer({
     storage: multer.diskStorage({
+
         destination: (req, file, cb) => {
-            const dest = file.fieldname === 'cv'
+
+            const dest =
+                file.fieldname === 'cv'
                 ? path.join(ROOT, 'uploads', 'cv')
                 : path.join(ROOT, 'uploads', 'foto');
+
             cb(null, dest);
         },
+
+
         filename: (req, file, cb) => {
-            const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, unique + '-' + file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_'));
+
+            const unique =
+                Date.now() + '-' +
+                Math.round(Math.random() * 1e9);
+
+            cb(
+                null,
+                unique + '-' +
+                file.originalname.replace(
+                    /[^a-zA-Z0-9.\-_]/g,
+                    '_'
+                )
+            );
         }
+
     }),
-    limits: { fileSize: 25 * 1024 * 1024 },
+
+    limits: {
+        fileSize: 25 * 1024 * 1024
+    },
+
+
     fileFilter: (req, file, cb) => {
+
         if (file.fieldname === 'cv') {
-            if (['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.mimetype)) cb(null, true);
-            else cb(new Error('CV harus berformat PDF atau Word (.doc/.docx)'));
-        } else if (file.fieldname === 'foto_full' || file.fieldname.startsWith('foto')) {
-            if (file.mimetype.startsWith('image/')) cb(null, true);
-            else cb(new Error('File harus berupa gambar'));
-        } else {
+
+            if (
+                [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                ].includes(file.mimetype)
+            ) {
+                cb(null, true);
+            } else {
+                cb(new Error(
+                    'CV harus berformat PDF atau Word (.doc/.docx)'
+                ));
+            }
+
+        } 
+        
+        else if (
+            file.fieldname === 'foto_full' ||
+            file.fieldname.startsWith('foto')
+        ) {
+
+            if (file.mimetype.startsWith('image/')) {
+                cb(null, true);
+            } else {
+                cb(new Error(
+                    'File harus berupa gambar'
+                ));
+            }
+
+        } 
+        
+        else {
             cb(null, true);
         }
     }
@@ -130,6 +251,66 @@ app.post('/api/auth/admin/otp/verify', async (req, res) => {
 });
 
 // ── USER REGISTER ──
+// ── LOWONGAN ENDPOINTS ──
+// GET semua lowongan aktif (public)
+app.get('/api/lowongan', async (req, res) => {
+    try {
+        const r = await pool.query("SELECT * FROM lowongan WHERE status = 'Aktif' ORDER BY created_at DESC");
+        res.json({ success: true, data: r.rows });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// GET semua lowongan (admin)
+app.get('/api/admin/lowongan', async (req, res) => {
+    try {
+        const r = await pool.query('SELECT * FROM lowongan ORDER BY created_at DESC');
+        res.json({ success: true, data: r.rows });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// POST tambah lowongan (admin)
+app.post('/api/admin/lowongan', async (req, res) => {
+    const { posisi, deskripsi, persyaratan, lokasi, tipe } = req.body;
+    if (!posisi) return res.status(400).json({ success: false, message: 'Posisi wajib diisi' });
+    try {
+        const r = await pool.query(
+            'INSERT INTO lowongan (posisi, deskripsi, persyaratan, lokasi, tipe) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+            [posisi, deskripsi || '', persyaratan || '', lokasi || 'Surabaya', tipe || 'Full-time']
+        );
+        res.json({ success: true, data: r.rows[0] });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// PUT edit lowongan (admin)
+app.put('/api/admin/lowongan/:id', async (req, res) => {
+    const { posisi, deskripsi, persyaratan, lokasi, tipe, status } = req.body;
+    try {
+        const r = await pool.query(
+            'UPDATE lowongan SET posisi=$1, deskripsi=$2, persyaratan=$3, lokasi=$4, tipe=$5, status=$6 WHERE id=$7 RETURNING *',
+            [posisi, deskripsi, persyaratan, lokasi, tipe, status, req.params.id]
+        );
+        res.json({ success: true, data: r.rows[0] });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// DELETE lowongan (admin)
+app.delete('/api/admin/lowongan/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM lowongan WHERE id=$1', [req.params.id]);
+        res.json({ success: true, message: 'Lowongan berhasil dihapus' });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 app.post('/api/user/register', async (req, res) => {
     const { username, email, phone, password } = req.body;
     if (!username || !password) return res.status(400).json({ success:false, message:'Username dan password wajib diisi' });
@@ -544,8 +725,13 @@ app.get('/api/submissions', async (req, res) => {
                     id: row.id,
                     name: row.nama || '-',
                     nik: row.nik || '-',
+                    email: row.email || '-',
+                    telepon: row.telepon || row.phone || '-',
+                    project: row.project || '-',
+                    nomor_kk: row.nomor_kk || '-',
+                    alasan: row.alasan || '-',
                     type,
-                    status: row.submission_status || row.status || 'Baru',
+                    status: row.submission_status || row.status || 'New',
                     time: row.created_at ? new Date(row.created_at).toLocaleString('id-ID') : '-',
                     fields,
                     photos: Object.keys(photos).length > 0 ? photos : undefined
@@ -559,7 +745,26 @@ app.get('/api/submissions', async (req, res) => {
 });
 
 // ── SUBMISSIONS PATCH/DELETE ──
-app.patch('/api/submissions/:id', async (req, res) => { res.json({ success:true }); });
+app.patch('/api/submissions/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status, type } = req.body;
+    if (!status || !type || !id) return res.status(400).json({ success:false, message:'Data tidak lengkap' });
+    try {
+        const tableMap = {
+            'Pelamar Indo5': 'form_pelamar',
+            'Data Diri Karyawan': 'form_datadiri',
+            'Surat Referensi': 'form_referensi',
+            'Blacklist Indolima': 'blacklist'
+        };
+        const table = tableMap[type];
+        if (!table) return res.status(400).json({ success:false, message:'Tipe tidak dikenal' });
+        await pool.query('UPDATE ' + table + ' SET status=$1 WHERE id=$2', [status, id]);
+        res.json({ success:true, message:'Status berhasil diupdate' });
+    } catch(e) {
+        console.error('[PATCH STATUS ERROR]', e);
+        res.status(500).json({ success:false, message:e.message });
+    }
+});
 app.delete('/api/submissions/:id', async (req, res) => {
     const { id } = req.params;
     const type = req.query.type || (req.body && req.body.type);

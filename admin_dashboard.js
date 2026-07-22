@@ -539,7 +539,7 @@ window.saveStatus = async () => {
             const r = await fetch(`${apiBase()}/api/submissions/${item.id}`, {
                 method: 'PATCH',
                 headers: adminApiHeaders(),
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({ status: newStatus, type: item.type }),
             });
             if (!r.ok) {
                 showAdminToast('❌ Gagal menyimpan status ke server.');
@@ -680,13 +680,13 @@ window.approveFromModal = async () => {
     if (currentDetailIdx === null || currentDetailIdx === undefined) return;
     const item = dashboardData[currentDetailIdx];
     if (!item) return;
-    const newStatus = 'Lengkap';
+    const newStatus = 'Done';
     if (usePostgresApi() && item.id) {
         try {
             const r = await fetch(`${apiBase()}/api/submissions/${item.id}`, {
                 method: 'PATCH',
                 headers: adminApiHeaders(),
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({ status: newStatus, type: item.type }),
             });
             if (!r.ok) {
                 showAdminToast('❌ Gagal menyimpan ke server.');
