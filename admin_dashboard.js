@@ -355,18 +355,57 @@ function renderTable(query = '') {
 
     tbody.innerHTML = filtered.map((item) => {
         const realIdx = dashboardData.indexOf(item);
+        // Info identitas
+        const namaProyek = item.project || '-';
+        const noKK = item.nomor_kk || '-';
+        const noKTP = item.nik || '-';
+        // Kontak
+        const emailVal = item.email || '-';
+        const telpVal = item.telepon || item.phone || '-';
+        const emailLink = emailVal !== '-'
+            ? `<a href="mailto:${emailVal}" style="color:#b71c1c;text-decoration:none;font-weight:600;" title="Kirim email ke ${emailVal}">✉️ ${emailVal}</a>`
+            : '<span style="color:#ccc">-</span>';
+        const telpLink = telpVal !== '-'
+            ? `<a href="https://wa.me/${telpVal.replace(/[^0-9]/g,'')}" target="_blank" style="color:#25d366;text-decoration:none;font-weight:600;" title="Chat WhatsApp">📱 ${telpVal}</a>`
+            : '<span style="color:#ccc">-</span>';
+        // Type emoji
+        const typeEmoji = {
+            'Data Diri Karyawan': '🪪',
+            'Surat Referensi': '📄',
+            'Pelamar Indo5': '💼',
+            'Blacklist Indolima': '🚫'
+        }[item.type] || '📋';
         return `
-        <tr class="table-row-anim">
+        <tr class="table-row-anim" data-idx="${realIdx}" style="cursor:pointer;">
             <td>
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div class="avatar-mini" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">${(item.name || '?')[0]}</div>
+                    <div class="avatar-mini" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">${(item.name || '?')[0].toUpperCase()}</div>
                     <div>
-                        <strong>${item.name || '-'}</strong><br>
-                        <small style="color:var(--text-sub)">${item.nik || '-'}</small>
+                        <strong>${item.name || '-'}</strong>
+                        <small style="color:var(--text-sub);display:block;">${item.nik || '-'}</small>
                     </div>
                 </div>
             </td>
-            <td><span class="type-badge" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">${item.type || '-'}</span></td>
+            <td>
+                <div style="min-width:160px;">
+                    <div style="margin-bottom:6px;">
+                        <span class="type-badge" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">
+                            ${typeEmoji} ${item.type || '-'}
+                        </span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;">
+                        ${namaProyek !== '-' ? `<span style="color:#666;">📁 <strong>Proyek:</strong> ${namaProyek}</span>` : ''}
+                        ${noKK !== '-' ? `<span style="color:#666;">🏠 <strong>No KK:</strong> ${noKK}</span>` : ''}
+                        <span style="color:#666;">🪪 <strong>NIK:</strong> ${noKTP}</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:4px;">
+                    <div>${emailLink}</div>
+                    <div>${telpLink}</div>
+                </div>
+            </td>
             <td style="color:var(--text-sub);font-size:0.9rem">${item.time || '-'}</td>
             <td>${window._renderStatusBadge ? window._renderStatusBadge(item.status) : '<span class="type-badge">' + (item.status||'New') + '</span>'}</td>
             <td>
