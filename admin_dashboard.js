@@ -361,10 +361,14 @@ function renderTable(query = '') {
         const noKTP = item.nik || '-';
         // Kontak
         const emailVal = item.email || '-';
+        const emailKantorVal = item.email_kantor || null;
         const telpVal = item.telepon || item.phone || '-';
         const emailLink = emailVal !== '-'
             ? `<a href="mailto:${emailVal}" style="color:#b71c1c;text-decoration:none;font-weight:600;" title="Kirim email ke ${emailVal}">✉️ ${emailVal}</a>`
             : '<span style="color:#ccc">-</span>';
+        const emailKantorLink = emailKantorVal
+            ? `<a href="mailto:${emailKantorVal}" style="color:#3b82f6;text-decoration:none;font-weight:600;" title="Kirim email ke ${emailKantorVal}">🏢 ${emailKantorVal}</a>`
+            : '';
         const telpLink = telpVal !== '-'
             ? `<a href="https://wa.me/${telpVal.replace(/[^0-9]/g,'')}" target="_blank" style="color:#25d366;text-decoration:none;font-weight:600;" title="Chat WhatsApp">📱 ${telpVal}</a>`
             : '<span style="color:#ccc">-</span>';
@@ -403,6 +407,7 @@ function renderTable(query = '') {
             <td>
                 <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:4px;">
                     <div>${emailLink}</div>
+                    ${emailKantorLink ? `<div>${emailKantorLink}</div>` : ''}
                     <div>${telpLink}</div>
                 </div>
             </td>
