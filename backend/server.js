@@ -519,13 +519,20 @@ app.post('/api/referensi', uploadFoto.fields([{ name: 'foto_ktp', maxCount: 1 }]
     try {
         const cek = await pool.query('SELECT id FROM form_referensi WHERE email = $1', [email]);
         if (cek.rows.length > 0) return res.status(409).json({ success:false, message:'Email sudah pernah mengajukan referensi!' });
-        if (nik && project) {
-            const cekDup = await pool.query(
-                'SELECT id FROM form_referensi WHERE nik = $1 AND project = $2',
-                [nik, project]
-            );
-            if (cekDup.rows.length > 0) {
-                return res.status(409).json({ success:false, message:'Data dengan NIK dan Nama Project yang sama sudah terdaftar!' });
+        const uniqueChecksReferensi = [
+            { field: 'nik', label: 'No KTP', value: nik },
+            { field: 'nik_karyawan', label: 'NIK Karyawan', value: nik_karyawan },
+            { field: 'project', label: 'Nama Project', value: project },
+        ];
+        for (const chk of uniqueChecksReferensi) {
+            if (chk.value) {
+                const cekDup = await pool.query(
+                    `SELECT id FROM form_referensi WHERE ${chk.field} = $1`,
+                    [chk.value]
+                );
+                if (cekDup.rows.length > 0) {
+                    return res.status(409).json({ success:false, message: chk.label + ' sudah pernah terdaftar!' });
+                }
             }
         }
         const foto_ktp = req.files?.foto_ktp?.[0] ? '/uploads/foto/' + req.files.foto_ktp[0].filename : null;
@@ -547,13 +554,21 @@ app.post('/api/datadiri', uploadFoto.fields([{ name: 'foto_ktp', maxCount: 1 }, 
     try {
         const cek = await pool.query('SELECT id FROM form_datadiri WHERE email = $1', [email]);
         if (cek.rows.length > 0) return res.status(409).json({ success:false, message:'Email sudah pernah mendaftar!' });
-        if (nik && project && nomor_kk) {
-            const cekDup = await pool.query(
-                'SELECT id FROM form_datadiri WHERE nik = $1 AND project = $2 AND nomor_kk = $3',
-                [nik, project, nomor_kk]
-            );
-            if (cekDup.rows.length > 0) {
-                return res.status(409).json({ success:false, message:'Data dengan NIK, Nama Project, dan No KK yang sama sudah terdaftar!' });
+        const uniqueChecksDatadiri = [
+            { field: 'nik', label: 'No KTP', value: nik },
+            { field: 'nik_karyawan', label: 'NIK Karyawan', value: nik_karyawan },
+            { field: 'project', label: 'Nama Project', value: project },
+            { field: 'nomor_kk', label: 'No KK', value: nomor_kk },
+        ];
+        for (const chk of uniqueChecksDatadiri) {
+            if (chk.value) {
+                const cekDup = await pool.query(
+                    `SELECT id FROM form_datadiri WHERE ${chk.field} = $1`,
+                    [chk.value]
+                );
+                if (cekDup.rows.length > 0) {
+                    return res.status(409).json({ success:false, message: chk.label + ' sudah pernah terdaftar!' });
+                }
             }
         }
         const foto_ktp = req.files?.foto_ktp?.[0] ? '/uploads/foto/' + req.files.foto_ktp[0].filename : null;
@@ -744,7 +759,23 @@ app.get('/api/submissions', async (req, res) => {
                     name: row.nama || '-',
                     nik: row.nik || '-',
                     nik_karyawan: row.nik_karyawan || null,
-                    email: row.email || '-',
+                    email: (() => {
+                        let e = row.email || '-';
+                        if (typeof e === 'string' && e.startsWith('{')) {
+                            e = e.replace(/[{}"]/g, '').split(',').map(x => x.trim());
+                        } else {
+                            e = [e];
+                        }
+                        return e[0] || '-';
+                    })(),
+                    email_kantor: (() => {
+                        let e = row.email || '-';
+                        if (typeof e === 'string' && e.startsWith('{')) {
+                            e = e.replace(/[{}"]/g, '').split(',').map(x => x.trim());
+                            return e[1] || null;
+                        }
+                        return null;
+                    })(),
                     email_kantor: row.email_kantor || null,
                     telepon: row.telepon || row.phone || '-',
                     project: row.project || '-',

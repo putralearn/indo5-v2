@@ -743,6 +743,73 @@ width:100%;padding-top:16px;
               </div>
             </div>
           </div>
+            <!-- Manajemen Lowongan Kerja -->
+            <div class="settings-card" id="lowonganManageCard" style="margin-top:24px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
+                <h3><i class="fa-solid fa-briefcase" style="margin-right:8px;color:var(--primary)"></i>Manajemen Lowongan Kerja</h3>
+                <button class="security-btn" style="width:auto;padding:8px 16px;font-size:0.85rem;" onclick="openLowonganModal()">
+                  <i class="fa-solid fa-plus"></i> Tambah Lowongan
+                </button>
+              </div>
+              <p style="color:var(--text-sub);font-size:0.85rem;margin-bottom:16px;">Kelola daftar lowongan kerja yang tampil di halaman pelamar.</p>
+              <div id="lowonganAdminList" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+
+            <!-- Modal Tambah/Edit Lowongan -->
+            <div class="modal-overlay" id="lowonganModal" style="display:none;">
+              <div class="modal-box">
+                <div class="modal-header">
+                  <span id="lowonganModalTitle">Tambah Lowongan</span>
+                  <button class="modal-close-btn" onclick="closeLowonganModal()">&times;</button>
+                </div>
+                <div class="modal-fields" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                  <input type="hidden" id="lowonganId">
+                  <div>
+                    <label class="security-label">Posisi</label>
+                    <div class="security-input-wrap">
+                      <i class="fa-solid fa-briefcase"></i>
+                      <input type="text" class="security-input" id="lowonganPosisi" placeholder="Contoh: Staff Gudang">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="security-label">Deskripsi</label>
+                    <textarea id="lowonganDeskripsi" rows="3" style="width:100%;border:1px solid var(--border,#2d3548);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:0.9rem;background:transparent;"></textarea>
+                  </div>
+                  <div>
+                    <label class="security-label">Persyaratan</label>
+                    <textarea id="lowonganPersyaratan" rows="3" style="width:100%;border:1px solid var(--border,#2d3548);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:0.9rem;background:transparent;"></textarea>
+                  </div>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:160px;">
+                      <label class="security-label">Lokasi</label>
+                      <div class="security-input-wrap">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <input type="text" class="security-input" id="lowonganLokasi" placeholder="Surabaya">
+                      </div>
+                    </div>
+                    <div style="flex:1;min-width:160px;">
+                      <label class="security-label">Tipe</label>
+                      <select id="lowonganTipe" style="width:100%;border:1px solid var(--border,#2d3548);border-radius:10px;padding:10px 12px;font-size:0.9rem;background:transparent;">
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Kontrak">Kontrak</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="security-label">Status</label>
+                    <select id="lowonganStatus" style="width:100%;border:1px solid var(--border,#2d3548);border-radius:10px;padding:10px 12px;font-size:0.9rem;background:transparent;">
+                      <option value="Aktif">Aktif</option>
+                      <option value="Nonaktif">Nonaktif</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="modal-btn modal-btn-close" onclick="closeLowonganModal()">Batal</button>
+                  <button class="modal-btn modal-btn-approve" onclick="submitLowongan()">Simpan</button>
+                </div>
+              </div>
+            </div>
         </div>
       </section>
     </main>

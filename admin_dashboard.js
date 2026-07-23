@@ -1615,3 +1615,105 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+// ============ CRUD LOWONGAN KERJA (ADMIN) ============
+const API_BASE_LOWONGAN = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000' : 'https://avid-widget-revoke.ngrok-free.dev';
+
+let lowonganDataCache = [];
+
+async function loadLowonganAdmin() {
+    const list = document.getElementById('lowonganAdminList');
+    if (!list) return;
+    list.innerHTML = '<p style="color:var(--text-sub);font-size:0.85rem;">Memuat...</p>';
+    try {
+        const res = await fetch(API_BASE_LOWONGAN + '/api/admin/lowongan');
+        const data = await res.json();
+        if (data.success) renderLowonganAdmin(data.data);
+        else list.innerHTML = '<p style="color:var(--primary);font-size:0.85rem;">Gagal memuat data lowongan.</p>';
+    } catch (e) {
+        list.innerHTML = '<p style="color:var(--primary);font-size:0.85rem;">Tidak dapat terhubung ke server.</p>';
+    }
+}
+
+function renderLowonganAdmin(items) {
+    lowonganDataCache = items;
+    const list = document.getElementById('lowonganAdminList');
+    if (!items.length) { list.innerHTML = '<p style="color:var(--text-sub);font-size:0.85rem;">Belum ada lowongan.</p>'; return; }
+    list.innerHTML = items.map((l, idx) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border:1px solid var(--border,#eee);border-radius:10px;flex-wrap:wrap;">
+            <div style="min-width:0;">
+                <div style="font-weight:700;font-size:0.9rem;">${l.posisi} <span style="font-weight:500;font-size:0.75rem;color:${l.status === 'Aktif' ? '#2e7d32' : '#999'};margin-left:6px;">● ${l.status}</span></div>
+                <div style="font-size:0.78rem;color:var(--text-sub);">${l.lokasi || '-'} · ${l.tipe || '-'}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+                <button onclick="openLowonganModal(${idx})" style="padding:6px 12px;border-radius:8px;border:1px solid var(--primary);background:transparent;color:var(--primary);cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteLowongan(${l.id})" style="padding:6px 12px;border-radius:8px;border:1px solid #e53935;background:transparent;color:#e53935;cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openLowonganModal(idx) {
+    const data = (idx !== undefined && idx !== null && lowonganDataCache[idx]) ? lowonganDataCache[idx] : null;
+    document.getElementById('lowonganModalTitle').textContent = data ? 'Edit Lowongan' : 'Tambah Lowongan';
+    document.getElementById('lowonganId').value = data ? data.id : '';
+    document.getElementById('lowonganPosisi').value = data ? data.posisi : '';
+    document.getElementById('lowonganDeskripsi').value = data ? (data.deskripsi || '') : '';
+    document.getElementById('lowonganPersyaratan').value = data ? (data.persyaratan || '') : '';
+    document.getElementById('lowonganLokasi').value = data ? (data.lokasi || 'Surabaya') : 'Surabaya';
+    document.getElementById('lowonganTipe').value = data ? (data.tipe || 'Full-time') : 'Full-time';
+    document.getElementById('lowonganStatus').value = data ? (data.status || 'Aktif') : 'Aktif';
+    document.getElementById('lowonganModal').style.display = 'flex';
+}
+
+function closeLowonganModal() {
+    document.getElementById('lowonganModal').style.display = 'none';
+}
+
+async function submitLowongan() {
+    const id = document.getElementById('lowonganId').value;
+    const payload = {
+        posisi: document.getElementById('lowonganPosisi').value.trim(),
+        deskripsi: document.getElementById('lowonganDeskripsi').value.trim(),
+        persyaratan: document.getElementById('lowonganPersyaratan').value.trim(),
+        lokasi: document.getElementById('lowonganLokasi').value.trim() || 'Surabaya',
+        tipe: document.getElementById('lowonganTipe').value,
+        status: document.getElementById('lowonganStatus').value
+    };
+    if (!payload.posisi) { alert('Posisi wajib diisi'); return; }
+    try {
+        const url = id ? (API_BASE_LOWONGAN + '/api/admin/lowongan/' + id) : (API_BASE_LOWONGAN + '/api/admin/lowongan');
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (data.success) {
+            closeLowonganModal();
+            loadLowonganAdmin();
+        } else {
+            alert(data.message || 'Gagal menyimpan lowongan');
+        }
+    } catch (e) {
+        alert('Tidak dapat terhubung ke server');
+    }
+}
+
+async function deleteLowongan(id) {
+    if (!confirm('Hapus lowongan ini?')) return;
+    try {
+        const res = await fetch(API_BASE_LOWONGAN + '/api/admin/lowongan/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) loadLowonganAdmin();
+        else alert(data.message || 'Gagal menghapus lowongan');
+    } catch (e) {
+        alert('Tidak dapat terhubung ke server');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const _origSettingsClick = navSettings.onclick;
+    navSettings.onclick = function () {
+        if (_origSettingsClick) _origSettingsClick();
+        loadLowonganAdmin();
+    };
+});
