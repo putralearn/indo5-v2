@@ -203,7 +203,7 @@
           style="font-size:0.8rem;margin-top:4px;display:block;min-height:18px;" inputmode="numeric" maxlength="16" oninput="validateNik(this)" onblur="validateNik(this)"><p class="field-error" style="color:#e53935;font-size:0.78rem;margin-top:4px;display:none;"></p>
     </span>
 </div>
-<div class="field"><label>NIK Karyawan</label><input type="text" name="nik_karyawan" placeholder="Nomor Induk Karyawan" inputmode="numeric"></div>
+<div class="field"><label>NIK Karyawan</label><input type="text" name="nik_karyawan" placeholder="16 digit NIK Karyawan" inputmode="numeric" maxlength="16" oninput="validateNik(this)" onblur="validateNik(this)"><p style="font-size:0.8rem;margin-top:4px;display:none;color:#e53935;"></p></div>
             <div class="field"><label>Alamat Lengkap Sesuai KTP <span class="req">*</span></label>
                 <textarea name="alamat_ktp" required
                     placeholder="contoh: Jl Kutisari No.04, RT/02 RW/01, Tenggilis, Tenggilis Mejoyo, Surabaya"></textarea>
