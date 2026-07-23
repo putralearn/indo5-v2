@@ -514,14 +514,23 @@ app.get('/api/pelamar', async (req, res) => {
 
 // ── FORM REFERENSI ──
 app.post('/api/referensi', uploadFoto.fields([{ name: 'foto_ktp', maxCount: 1 }]), async (req, res) => {
-    const { nama_ktp, nik, email, telepon, alamat_ktp, tempat_lahir, tanggal_lahir, jk, project, jabatan, join_date, end_date, alasan } = req.body;
+    const { nama_ktp, nik, nik_karyawan, email, telepon, alamat_ktp, tempat_lahir, tanggal_lahir, jk, project, jabatan, join_date, end_date, alasan } = req.body;
     if (!nama_ktp || !email) return res.status(400).json({ success:false, message:'Nama dan email wajib diisi' });
     try {
         const cek = await pool.query('SELECT id FROM form_referensi WHERE email = $1', [email]);
         if (cek.rows.length > 0) return res.status(409).json({ success:false, message:'Email sudah pernah mengajukan referensi!' });
+        if (nik && project) {
+            const cekDup = await pool.query(
+                'SELECT id FROM form_referensi WHERE nik = $1 AND project = $2',
+                [nik, project]
+            );
+            if (cekDup.rows.length > 0) {
+                return res.status(409).json({ success:false, message:'Data dengan NIK dan Nama Project yang sama sudah terdaftar!' });
+            }
+        }
         const foto_ktp = req.files?.foto_ktp?.[0] ? '/uploads/foto/' + req.files.foto_ktp[0].filename : null;
-        await pool.query('INSERT INTO form_referensi (nama,nik,email,telepon,alamat_ktp,tempat_lahir,tanggal_lahir,jk,project,jabatan,join_date,end_date,alasan,foto_ktp) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)',
-            [nama_ktp,nik||null,email,telepon||null,alamat_ktp||null,tempat_lahir||null,tanggal_lahir||null,jk||null,project||null,jabatan||null,join_date||null,end_date||null,alasan||null,foto_ktp]);
+        await pool.query('INSERT INTO form_referensi (nama,nik,nik_karyawan,email,telepon,alamat_ktp,tempat_lahir,tanggal_lahir,jk,project,jabatan,join_date,end_date,alasan,foto_ktp) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)',
+            [nama_ktp,nik||null,nik_karyawan||null,email,telepon||null,alamat_ktp||null,tempat_lahir||null,tanggal_lahir||null,jk||null,project||null,jabatan||null,join_date||null,end_date||null,alasan||null,foto_ktp]);
         res.json({ success:true, message:'Formulir referensi berhasil dikirim!' });
     } catch(e) { res.status(500).json({ success:false, message:'Server error: ' + e.message }); }
 });
@@ -533,17 +542,26 @@ app.get('/api/referensi', async (req, res) => {
 
 // ── FORM DATA DIRI ──
 app.post('/api/datadiri', uploadFoto.fields([{ name: 'foto_ktp', maxCount: 1 }, { name: 'foto_sim', maxCount: 1 }, { name: 'foto_kk', maxCount: 1 }, { name: 'foto_skck', maxCount: 1 }]), async (req, res) => {
-    const { nama, nik, email, email_kantor, telepon, area, jabatan, project, join_date, alamat_ktp, alamat_domisili, tempat_lahir, tanggal_lahir, agama, jk, status, jumlah_anak, pendidikan, npwp, alamat_npwp, rekening, bpjs_tk, bpjs_kes, bank, ibu_kandung, nama_keluarga, telepon_keluarga, hubungan, nomor_kk } = req.body;
+    const { nama, nik, nik_karyawan, email, email_kantor, telepon, area, jabatan, project, join_date, alamat_ktp, alamat_domisili, tempat_lahir, tanggal_lahir, agama, jk, status, jumlah_anak, pendidikan, npwp, alamat_npwp, rekening, bpjs_tk, bpjs_kes, bank, ibu_kandung, nama_keluarga, telepon_keluarga, hubungan, nomor_kk } = req.body;
     if (!nama || !email) return res.status(400).json({ success:false, message:'Nama dan email wajib diisi' });
     try {
         const cek = await pool.query('SELECT id FROM form_datadiri WHERE email = $1', [email]);
         if (cek.rows.length > 0) return res.status(409).json({ success:false, message:'Email sudah pernah mendaftar!' });
+        if (nik && project && nomor_kk) {
+            const cekDup = await pool.query(
+                'SELECT id FROM form_datadiri WHERE nik = $1 AND project = $2 AND nomor_kk = $3',
+                [nik, project, nomor_kk]
+            );
+            if (cekDup.rows.length > 0) {
+                return res.status(409).json({ success:false, message:'Data dengan NIK, Nama Project, dan No KK yang sama sudah terdaftar!' });
+            }
+        }
         const foto_ktp = req.files?.foto_ktp?.[0] ? '/uploads/foto/' + req.files.foto_ktp[0].filename : null;
         const foto_sim = req.files?.foto_sim?.[0] ? '/uploads/foto/' + req.files.foto_sim[0].filename : null;
         const foto_kk = req.files?.foto_kk?.[0] ? '/uploads/foto/' + req.files.foto_kk[0].filename : null;
         const foto_skck = req.files?.foto_skck?.[0] ? '/uploads/foto/' + req.files.foto_skck[0].filename : null;
-        await pool.query('INSERT INTO form_datadiri (nama,nik,email,email_kantor,telepon,area,jabatan,project,join_date,alamat_ktp,alamat_domisili,tempat_lahir,tanggal_lahir,agama,jk,status,jumlah_anak,pendidikan,npwp,alamat_npwp,rekening,bpjs_tk,bpjs_kes,bank,ibu_kandung,nama_keluarga,telepon_keluarga,hubungan,nomor_kk,foto_ktp,foto_sim,foto_kk,foto_skck) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33)',
-            [nama,nik||null,email,email_kantor||null,telepon||null,area||null,jabatan||null,project||null,join_date||null,alamat_ktp||null,alamat_domisili||null,tempat_lahir||null,tanggal_lahir||null,agama||null,jk||null,status||null,jumlah_anak||null,pendidikan||null,npwp||null,alamat_npwp||null,rekening||null,bpjs_tk||null,bpjs_kes||null,bank||null,ibu_kandung||null,nama_keluarga||null,telepon_keluarga||null,hubungan||null,nomor_kk||null,foto_ktp,foto_sim,foto_kk,foto_skck]);
+        await pool.query('INSERT INTO form_datadiri (nama,nik,nik_karyawan,email,email_kantor,telepon,area,jabatan,project,join_date,alamat_ktp,alamat_domisili,tempat_lahir,tanggal_lahir,agama,jk,status,jumlah_anak,pendidikan,npwp,alamat_npwp,rekening,bpjs_tk,bpjs_kes,bank,ibu_kandung,nama_keluarga,telepon_keluarga,hubungan,nomor_kk,foto_ktp,foto_sim,foto_kk,foto_skck) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34)',
+            [nama,nik||null,nik_karyawan||null,email,email_kantor||null,telepon||null,area||null,jabatan||null,project||null,join_date||null,alamat_ktp||null,alamat_domisili||null,tempat_lahir||null,tanggal_lahir||null,agama||null,jk||null,status||null,jumlah_anak||null,pendidikan||null,npwp||null,alamat_npwp||null,rekening||null,bpjs_tk||null,bpjs_kes||null,bank||null,ibu_kandung||null,nama_keluarga||null,telepon_keluarga||null,hubungan||null,nomor_kk||null,foto_ktp,foto_sim,foto_kk,foto_skck]);
         res.json({ success:true, message:'Data diri berhasil dikirim!' });
     } catch(e) { res.status(500).json({ success:false, message:'Server error: ' + e.message }); }
 });
@@ -725,6 +743,7 @@ app.get('/api/submissions', async (req, res) => {
                     id: row.id,
                     name: row.nama || '-',
                     nik: row.nik || '-',
+                    nik_karyawan: row.nik_karyawan || null,
                     email: row.email || '-',
                     email_kantor: row.email_kantor || null,
                     telepon: row.telepon || row.phone || '-',

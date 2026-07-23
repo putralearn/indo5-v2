@@ -400,7 +400,9 @@ function renderTable(query = '') {
                     <div style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;">
                         ${namaProyek !== '-' ? `<span style="color:#666;">📁 <strong>Proyek:</strong> ${namaProyek}</span>` : ''}
                         ${noKK !== '-' ? `<span style="color:#666;">🏠 <strong>No KK:</strong> ${noKK}</span>` : ''}
-                        <span style="color:#666;">🪪 <strong>NIK:</strong> ${noKTP}</span>
+                        <span style="color:#666;">🪪 <strong>No KTP:</strong> ${noKTP}</span>
+                        ${item.nik_karyawan ? `<span style="color:#666;">🆔 <strong>NIK:</strong> ${item.nik_karyawan}</span>` : ''}
+                        ${item.status_user ? `<span style="color:#8b5cf6;">💍 <strong>Status:</strong> ${item.status_user}</span>` : ''}
                     </div>
                 </div>
             </td>
