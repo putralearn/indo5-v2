@@ -218,33 +218,7 @@
                 </div>
             </div>
 
-            <div class="section-label">Posisi yang Dilamar</div>
-            <div class="field"><label>Posisi yang Akan Dilamar <span class="req">*</span></label>
-                <div class="radio-group">
-                    <label class="radio-item"><input type="radio" name="posisi" value="SPG/SPB" required>
-                        SPG/SPB</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="SMD/MD"> SMD/MD</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Sales"> Sales</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Admin"> Admin</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Team Leader"> Team Leader</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Area Coordinator"> Area
-                        Coordinator</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Produksi"> Produksi</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="SPV"> SPV</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Brand Ambassador"> Brand
-                        Ambassador</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Medical Representative"> Medical
-                        Representative</label>
-                    <label class="radio-item"><input type="radio" name="posisi" value="Lainnya"> Lainnya</label>
-                </div>
-            </div>
-
-
-            <div class="field" id="field-posisi-lain" style="display:none"><label>Posisi Lain (Tidak Ada di Daftar)</label>
-                <input type="text" name="posisi_lain" id="posisi_lain" placeholder="Tulis posisi yang diinginkan">
-            </div>
-
-            <div class="section-label">Dokumen</div>
+<div class="section-label">Dokumen</div>
             <div class="field"><label>Upload CV Format PDF <span class="req">*</span></label>
                 <div class="file-upload"><input type="file" name="cv" accept=".pdf" required>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -328,6 +302,9 @@ function submitForm(e) {
     const form = e ? e.target : document.querySelector('form');
     const fd = new FormData(form);
 
+    const selectedLowonganId = sessionStorage.getItem('selectedLowonganId');
+    if (selectedLowonganId) fd.set('lowongan_id', selectedLowonganId);
+
     const nama = fd.get('nama');
     const email = fd.get('email');
     if (!nama || !email) { showToast('Nama dan email wajib diisi!'); return; }
@@ -359,20 +336,7 @@ function submitForm(e) {
 }
 </script>
 <script>
-document.querySelectorAll('input[name="posisi"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        var fieldLain = document.getElementById('field-posisi-lain');
-        var inputLain = document.getElementById('posisi_lain');
-        if (this.value === 'Lainnya') {
-            fieldLain.style.display = 'block';
-            inputLain.required = true;
-        } else {
-            fieldLain.style.display = 'none';
-            inputLain.required = false;
-            inputLain.value = '';
-        }
-    });
-});
+
 </script>
 </body>
 

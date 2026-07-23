@@ -371,11 +371,23 @@ button#confirmCancelBtn, button#confirmOkBtn {
           <i class="fa-solid fa-ban" style="color:#111;"></i> <span style="color:#111;flex:1;text-align:left;">Blacklist Indolima</span>
           <span class="badge red" id="badge-blacklist">0</span>
         </button>
-        <a href="/formblaclits.html" target="_blank" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;margin-bottom:6px;background:linear-gradient(135deg,#7f0000,#b71c1c);color:#fff;font-size:0.85rem;font-weight:600;text-decoration:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-          <i class="fa-solid fa-circle-plus"></i>
-          <span style="flex:1;">Tambah Blacklist</span>
-          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;opacity:0.8;"></i>
+        <a href="/formblaclits.html" target="_blank" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;text-decoration:none;">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-circle-plus" style="color:#111;"></i>
+            <span style="color:#111;font-size:0.85rem;font-weight:400;">Tambah Blacklist</span>
+          </span>
+          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;color:#111;opacity:0.6;"></i>
         </a>
+      </div>
+
+      <div class="menu-section">
+        <span>REKRUTMEN</span>
+        <button id="navLowongan" class="menu-item" style="background:#ffffff;border-radius:10px;margin-bottom:6px;color:#111;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-briefcase" style="color:#111;"></i>
+            <span style="color:#111;font-size:0.85rem;font-weight:400;">Lowongan Kerja</span>
+          </span>
+        </button>
       </div>
 
       <div class="menu-section">
@@ -443,12 +455,13 @@ button#confirmCancelBtn, button#confirmOkBtn {
           <table class="activity-table">
             <thead>
               <tr>
-                <th>NAMA & NIK</th>
-                <th>TIPE & IDENTITAS</th>
+                <th>👤 NAMA & NIK</th>
+                <th>📋 JENIS FORM</th>
+                <th>🗂️ TIPE & IDENTITAS</th>
                 <th>📬 KONTAK USER</th>
-                <th>WAKTU</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
+                <th>🕒 WAKTU</th>
+                <th>🔖 STATUS</th>
+                <th>⚙️ AKSI</th>
               </tr>
             </thead>
             <tbody id="activityTableBody"></tbody>
@@ -743,6 +756,12 @@ width:100%;padding-top:16px;
               </div>
             </div>
           </div>
+            
+        </div>
+      </section>
+      <!-- ── LOWONGAN KERJA SECTION ── -->
+      <section id="lowonganSection" class="hidden">
+        <div class="settings-grid">
             <!-- Manajemen Lowongan Kerja -->
             <div class="settings-card" id="lowonganManageCard" style="margin-top:24px;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
@@ -756,7 +775,7 @@ width:100%;padding-top:16px;
             </div>
 
             <!-- Modal Tambah/Edit Lowongan -->
-            <div class="modal-overlay" id="lowonganModal" style="display:none;">
+            <div class="modal-overlay" id="lowonganModal">
               <div class="modal-box">
                 <div class="modal-header">
                   <span id="lowonganModalTitle">Tambah Lowongan</span>
@@ -778,6 +797,13 @@ width:100%;padding-top:16px;
                   <div>
                     <label class="security-label">Persyaratan</label>
                     <textarea id="lowonganPersyaratan" rows="3" style="width:100%;border:1px solid var(--border,#2d3548);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:0.9rem;background:transparent;"></textarea>
+                  </div>
+                  <div>
+                    <label class="security-label">Kuota Penerimaan</label>
+                    <div class="security-input-wrap">
+                      <i class="fa-solid fa-users"></i>
+                      <input type="number" min="0" class="security-input" id="lowonganKuota" placeholder="Kosongkan jika tidak dibatasi">
+                    </div>
                   </div>
                   <div style="display:flex;gap:12px;flex-wrap:wrap;">
                     <div style="flex:1;min-width:160px;">
@@ -812,6 +838,7 @@ width:100%;padding-top:16px;
             </div>
         </div>
       </section>
+
     </main>
   </div>
 

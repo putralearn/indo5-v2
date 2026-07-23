@@ -1297,3 +1297,23 @@ html, body { margin: 0 !important; padding: 0 !important; }
 #confirmModal button:active {
     transform: scale(0.97) !important;
 }
+
+/* ══ FIX: Zoom efek tombol Oke (Indo5Modal alert) ══ */
+#alertOkBtn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.08);
+}
+#alertOkBtn:active {
+    transform: scale(0.96);
+}
+
+/* ══ FIX: Hilangkan outline bawaan + font regular untuk menu Lowongan Kerja & Tambah Blacklist ══ */
+#navLowongan,
+.sidebar a[href="/formblaclits.html"] {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+#navLowongan span,
+.sidebar a[href="/formblaclits.html"] span {
+    font-weight: 400 !important;
+}

@@ -274,12 +274,12 @@ app.get('/api/admin/lowongan', async (req, res) => {
 
 // POST tambah lowongan (admin)
 app.post('/api/admin/lowongan', async (req, res) => {
-    const { posisi, deskripsi, persyaratan, lokasi, tipe } = req.body;
+    const { posisi, deskripsi, persyaratan, lokasi, tipe, kuota } = req.body;
     if (!posisi) return res.status(400).json({ success: false, message: 'Posisi wajib diisi' });
     try {
         const r = await pool.query(
-            'INSERT INTO lowongan (posisi, deskripsi, persyaratan, lokasi, tipe) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-            [posisi, deskripsi || '', persyaratan || '', lokasi || 'Surabaya', tipe || 'Full-time']
+            'INSERT INTO lowongan (posisi, deskripsi, persyaratan, lokasi, tipe, kuota) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+            [posisi, deskripsi || '', persyaratan || '', lokasi || 'Surabaya', tipe || 'Full-time', (kuota === undefined || kuota === '' || kuota === null) ? null : kuota]
         );
         res.json({ success: true, data: r.rows[0] });
     } catch(e) {
@@ -289,12 +289,23 @@ app.post('/api/admin/lowongan', async (req, res) => {
 
 // PUT edit lowongan (admin)
 app.put('/api/admin/lowongan/:id', async (req, res) => {
-    const { posisi, deskripsi, persyaratan, lokasi, tipe, status } = req.body;
+    const { posisi, deskripsi, persyaratan, lokasi, tipe, status, kuota } = req.body;
     try {
         const r = await pool.query(
-            'UPDATE lowongan SET posisi=$1, deskripsi=$2, persyaratan=$3, lokasi=$4, tipe=$5, status=$6 WHERE id=$7 RETURNING *',
-            [posisi, deskripsi, persyaratan, lokasi, tipe, status, req.params.id]
+            'UPDATE lowongan SET posisi=$1, deskripsi=$2, persyaratan=$3, lokasi=$4, tipe=$5, status=$6, kuota=$7 WHERE id=$8 RETURNING *',
+            [posisi, deskripsi, persyaratan, lokasi, tipe, status, (kuota === undefined || kuota === '' || kuota === null) ? null : kuota, req.params.id]
         );
+        res.json({ success: true, data: r.rows[0] });
+    } catch(e) {
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// PATCH toggle status cepat (admin)
+app.patch('/api/admin/lowongan/:id/status', async (req, res) => {
+    const { status } = req.body;
+    try {
+        const r = await pool.query('UPDATE lowongan SET status=$1 WHERE id=$2 RETURNING *', [status, req.params.id]);
         res.json({ success: true, data: r.rows[0] });
     } catch(e) {
         res.status(500).json({ success: false, message: e.message });
@@ -494,7 +505,7 @@ app.delete('/api/admin/users/:username', async (req, res) => {
 
 // ── FORM PELAMAR ──
 app.post('/api/pelamar', uploadCV.fields([{ name: 'cv', maxCount: 1 }, { name: 'foto_full', maxCount: 1 }]), async (req, res) => {
-    const { nama, email, usia, telepon, nik, tinggi, berat, penempatan, jk, status, pendidikan, posisi, pengalaman } = req.body;
+    const { nama, email, usia, telepon, nik, tinggi, berat, penempatan, jk, status, pendidikan, posisi, pengalaman, lowongan_id } = req.body;
     if (!nama || !email) return res.status(400).json({ success:false, message:'Nama dan email wajib diisi' });
     try {
         const cek = await pool.query('SELECT id FROM form_pelamar WHERE email = $1', [email]);
@@ -503,6 +514,19 @@ app.post('/api/pelamar', uploadCV.fields([{ name: 'cv', maxCount: 1 }, { name: '
         const fotoFilename = req.files?.foto_full?.[0] ? '/uploads/foto/' + req.files.foto_full[0].filename : null;
         await pool.query('INSERT INTO form_pelamar (nama,email,usia,telepon,nik,tinggi,berat,penempatan,jk,status,pendidikan,posisi,pengalaman,cv_filename,foto_full) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)',
             [nama,email,usia||null,telepon||null,nik||null,tinggi||null,berat||null,penempatan||null,jk||null,status||null,pendidikan||null,posisi||null,pengalaman||null,cvFilename,fotoFilename]);
+
+        if (lowongan_id) {
+            const lRes = await pool.query('SELECT kuota FROM lowongan WHERE id=$1', [lowongan_id]);
+            if (lRes.rows.length > 0 && lRes.rows[0].kuota !== null && lRes.rows[0].kuota > 0) {
+                const sisa = lRes.rows[0].kuota - 1;
+                if (sisa <= 0) {
+                    await pool.query('UPDATE lowongan SET kuota=0, status=$1 WHERE id=$2', ['Nonaktif', lowongan_id]);
+                } else {
+                    await pool.query('UPDATE lowongan SET kuota=$1 WHERE id=$2', [sisa, lowongan_id]);
+                }
+            }
+        }
+
         res.json({ success:true, message:'Lamaran berhasil dikirim!' });
     } catch(e) { res.status(500).json({ success:false, message:'Server error: ' + e.message }); }
 });

@@ -348,7 +348,7 @@ function renderTable(query = '') {
     });
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-sub);">Tidak ada data ditemukan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-sub);">Tidak ada data ditemukan</td></tr>`;
         updateCounters();
         return;
     }
@@ -391,12 +391,14 @@ function renderTable(query = '') {
                 </div>
             </td>
             <td>
+                <div style="min-width:140px;">
+                    <span class="type-badge" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">
+                        ${typeEmoji} ${item.type || '-'}
+                    </span>
+                </div>
+            </td>
+            <td>
                 <div style="min-width:160px;">
-                    <div style="margin-bottom:6px;">
-                        <span class="type-badge" style="background:${getTypeColor(item.type).bg};color:${getTypeColor(item.type).color};">
-                            ${typeEmoji} ${item.type || '-'}
-                        </span>
-                    </div>
                     <div style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;">
                         ${namaProyek !== '-' ? `<span style="color:#666;">📁 <strong>Proyek:</strong> ${namaProyek}</span>` : ''}
                         ${noKK !== '-' ? `<span style="color:#666;">🏠 <strong>No KK:</strong> ${noKK}</span>` : ''}
@@ -815,24 +817,30 @@ function syncFromStorage() {
 // ─────────────────────────────────────────────
 const navDashboard = document.getElementById('navDashboard');
 const navSettings = document.getElementById('navSettings');
+const navLowongan = document.getElementById('navLowongan');
 const dashboardSection = document.getElementById('dashboardSection');
 const settingsSection = document.getElementById('settingsSection');
+const lowonganSection = document.getElementById('lowonganSection');
 const searchInput = document.getElementById('searchInput');
 const navFilters = document.querySelectorAll('.nav-filter');
 
 function switchTab(tab) {
     dashboardSection.classList.toggle('hidden', tab !== 'dashboard');
     settingsSection.classList.toggle('hidden', tab !== 'settings');
+    if (lowonganSection) lowonganSection.classList.toggle('hidden', tab !== 'lowongan');
     navDashboard.classList.toggle('active', tab === 'dashboard');
     navSettings.classList.toggle('active', tab === 'settings');
+    if (navLowongan) navLowongan.classList.toggle('active', tab === 'lowongan');
     const titleEl = document.getElementById('pageTitle');
     if (titleEl) titleEl.innerText = tab === 'dashboard'
         ? (currentFilter === 'all' ? 'Dashboard' : currentFilter)
-        : 'Pengaturan';
+        : (tab === 'lowongan' ? 'Lowongan Kerja' : 'Pengaturan');
+    if (tab === 'lowongan') loadLowonganAdmin();
 }
 
 navDashboard.onclick = () => { currentFilter = 'all'; switchTab('dashboard'); renderTable(); };
 navSettings.onclick = () => switchTab('settings');
+if (navLowongan) navLowongan.onclick = () => switchTab('lowongan');
 
 navFilters.forEach(btn => {
     btn.onclick = () => {
@@ -1640,18 +1648,46 @@ function renderLowonganAdmin(items) {
     lowonganDataCache = items;
     const list = document.getElementById('lowonganAdminList');
     if (!items.length) { list.innerHTML = '<p style="color:var(--text-sub);font-size:0.85rem;">Belum ada lowongan.</p>'; return; }
-    list.innerHTML = items.map((l, idx) => `
+    list.innerHTML = items.map((l, idx) => {
+        const kuotaBadge = (l.kuota === null || l.kuota === undefined)
+            ? '<span style="font-size:0.72rem;color:#999;margin-left:6px;">· Kuota tidak dibatasi</span>'
+            : (l.kuota > 0
+                ? `<span style="font-size:0.72rem;color:#1565c0;margin-left:6px;">· Sisa kuota: ${l.kuota}</span>`
+                : '<span style="font-size:0.72rem;color:#e53935;margin-left:6px;">· Kuota habis</span>');
+        return `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border:1px solid var(--border,#eee);border-radius:10px;flex-wrap:wrap;">
             <div style="min-width:0;">
-                <div style="font-weight:700;font-size:0.9rem;">${l.posisi} <span style="font-weight:500;font-size:0.75rem;color:${l.status === 'Aktif' ? '#2e7d32' : '#999'};margin-left:6px;">● ${l.status}</span></div>
+                <div style="font-weight:700;font-size:0.9rem;">${l.posisi} <span style="font-weight:500;font-size:0.75rem;color:${l.status === 'Aktif' ? '#2e7d32' : '#999'};margin-left:6px;">● ${l.status}</span>${kuotaBadge}</div>
                 <div style="font-size:0.78rem;color:var(--text-sub);">${l.lokasi || '-'} · ${l.tipe || '-'}</div>
             </div>
             <div style="display:flex;gap:8px;flex-shrink:0;">
+                <button onclick="toggleLowonganStatus(${l.id}, '${l.status}')" title="Toggle status" style="padding:6px 12px;border-radius:8px;border:1px solid ${l.status === 'Aktif' ? '#999' : '#2e7d32'};background:transparent;color:${l.status === 'Aktif' ? '#999' : '#2e7d32'};cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-power-off"></i></button>
                 <button onclick="openLowonganModal(${idx})" style="padding:6px 12px;border-radius:8px;border:1px solid var(--primary);background:transparent;color:var(--primary);cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-pen"></i></button>
                 <button onclick="deleteLowongan(${l.id})" style="padding:6px 12px;border-radius:8px;border:1px solid #e53935;background:transparent;color:#e53935;cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
+}
+
+async function toggleLowonganStatus(id, currentStatus) {
+    const newStatus = currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif';
+    try {
+        const res = await fetch(API_BASE_LOWONGAN + '/api/admin/lowongan/' + id + '/status', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showAdminToast(newStatus === 'Aktif' ? 'Lowongan diaktifkan' : 'Lowongan dinonaktifkan');
+            loadLowonganAdmin();
+        } else {
+            Indo5Modal.alert({ title: 'Gagal Mengubah Status', body: data.message || 'Terjadi kesalahan.', icon: 'danger', btnText: 'Oke' });
+        }
+    } catch (e) {
+        Indo5Modal.alert({ title: 'Tidak Terhubung', body: 'Tidak dapat terhubung ke server.', icon: 'danger', btnText: 'Oke' });
+    }
 }
 
 function openLowonganModal(idx) {
@@ -1664,24 +1700,27 @@ function openLowonganModal(idx) {
     document.getElementById('lowonganLokasi').value = data ? (data.lokasi || 'Surabaya') : 'Surabaya';
     document.getElementById('lowonganTipe').value = data ? (data.tipe || 'Full-time') : 'Full-time';
     document.getElementById('lowonganStatus').value = data ? (data.status || 'Aktif') : 'Aktif';
-    document.getElementById('lowonganModal').style.display = 'flex';
+    document.getElementById('lowonganKuota').value = (data && data.kuota !== null && data.kuota !== undefined) ? data.kuota : '';
+    document.getElementById('lowonganModal').classList.add('show');
 }
 
 function closeLowonganModal() {
-    document.getElementById('lowonganModal').style.display = 'none';
+    document.getElementById('lowonganModal').classList.remove('show');
 }
 
 async function submitLowongan() {
     const id = document.getElementById('lowonganId').value;
+    const kuotaRaw = document.getElementById('lowonganKuota').value.trim();
     const payload = {
         posisi: document.getElementById('lowonganPosisi').value.trim(),
         deskripsi: document.getElementById('lowonganDeskripsi').value.trim(),
         persyaratan: document.getElementById('lowonganPersyaratan').value.trim(),
         lokasi: document.getElementById('lowonganLokasi').value.trim() || 'Surabaya',
         tipe: document.getElementById('lowonganTipe').value,
-        status: document.getElementById('lowonganStatus').value
+        status: document.getElementById('lowonganStatus').value,
+        kuota: kuotaRaw === '' ? null : parseInt(kuotaRaw, 10)
     };
-    if (!payload.posisi) { alert('Posisi wajib diisi'); return; }
+    if (!payload.posisi) { Indo5Modal.alert({ title: 'Form Tidak Lengkap', body: 'Posisi wajib diisi.', icon: 'warning', btnText: 'Oke' }); return; }
     try {
         const url = id ? (API_BASE_LOWONGAN + '/api/admin/lowongan/' + id) : (API_BASE_LOWONGAN + '/api/admin/lowongan');
         const method = id ? 'PUT' : 'POST';
@@ -1690,23 +1729,38 @@ async function submitLowongan() {
         if (data.success) {
             closeLowonganModal();
             loadLowonganAdmin();
+            showAdminToast(id ? 'Lowongan berhasil diperbarui' : 'Lowongan berhasil ditambahkan');
         } else {
-            alert(data.message || 'Gagal menyimpan lowongan');
+            Indo5Modal.alert({ title: 'Gagal Menyimpan', body: data.message || 'Gagal menyimpan lowongan.', icon: 'danger', btnText: 'Oke' });
         }
     } catch (e) {
-        alert('Tidak dapat terhubung ke server');
+        Indo5Modal.alert({ title: 'Tidak Terhubung', body: 'Tidak dapat terhubung ke server.', icon: 'danger', btnText: 'Oke' });
     }
 }
 
-async function deleteLowongan(id) {
-    if (!confirm('Hapus lowongan ini?')) return;
+function deleteLowongan(id) {
+    Indo5Modal.confirm({
+        title: 'Hapus Lowongan?',
+        body: 'Lowongan ini akan dihapus permanen dan tidak bisa dikembalikan.',
+        icon: 'danger',
+        confirmText: 'Ya, Hapus',
+        cancelText: 'Batal',
+        onConfirm: () => _doDeleteLowongan(id)
+    });
+}
+
+async function _doDeleteLowongan(id) {
     try {
         const res = await fetch(API_BASE_LOWONGAN + '/api/admin/lowongan/' + id, { method: 'DELETE' });
         const data = await res.json();
-        if (data.success) loadLowonganAdmin();
-        else alert(data.message || 'Gagal menghapus lowongan');
+        if (data.success) {
+            loadLowonganAdmin();
+            showAdminToast('Lowongan berhasil dihapus');
+        } else {
+            Indo5Modal.alert({ title: 'Gagal Menghapus', body: data.message || 'Gagal menghapus lowongan.', icon: 'danger', btnText: 'Oke' });
+        }
     } catch (e) {
-        alert('Tidak dapat terhubung ke server');
+        Indo5Modal.alert({ title: 'Tidak Terhubung', body: 'Tidak dapat terhubung ke server.', icon: 'danger', btnText: 'Oke' });
     }
 }
 
