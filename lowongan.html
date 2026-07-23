@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lowongan Kerja - PT Indolima Perkasa</title>
+    <link rel="stylesheet" href="desainuser.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .header { background: linear-gradient(135deg, #b71c1c, #7f0000); color: #fff; padding: 32px 20px; text-align: center; }
+        .header img { height: 60px; margin-bottom: 12px; }
+        .header h1 { margin: 0; font-size: 1.8rem; }
+        .header p { margin: 8px 0 0; opacity: 0.85; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+        .search-bar { display: flex; gap: 12px; margin-bottom: 24px; }
+        .search-bar input { flex: 1; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; }
+        .search-bar input:focus { border-color: #b71c1c; }
+        .filter-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 7px 18px; border-radius: 20px; border: 1.5px solid #b71c1c; background: transparent; color: #b71c1c; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: #b71c1c; color: #fff; }
+        .lowongan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border: 2px solid transparent; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(183,28,28,0.15); border-color: #b71c1c; }
+        .card-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
+        .badge-aktif { background: #e8f5e9; color: #2e7d32; }
+        .badge-fulltime { background: #e3f2fd; color: #1565c0; }
+        .card h3 { margin: 0 0 8px; font-size: 1.1rem; color: #1a1a1a; }
+        .card-meta { display: flex; gap: 12px; font-size: 0.85rem; color: #666; margin-bottom: 12px; }
+        .card-meta span { display: flex; align-items: center; gap: 4px; }
+        .card-desc { font-size: 0.9rem; color: #555; line-height: 1.5; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .btn-daftar { width: 100%; padding: 10px; background: #b71c1c; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-daftar:hover { background: #7f0000; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.4; }
+        .loading { text-align: center; padding: 60px; color: #b71c1c; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #333; color: #fff; padding: 12px 24px; border-radius: 10px; z-index: 9999; opacity: 0; transition: opacity 0.3s; }
+        .toast.show { opacity: 1; }
+        @media (max-width: 600px) { .lowongan-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <img src="logo_transparent.png" alt="PT Indolima Perkasa" onerror="this.style.display='none'">
+    <h1>Lowongan Kerja</h1>
+    <p>PT Indolima Perkasa — Bergabunglah bersama kami</p>
+</div>
+
+<div class="container">
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Cari posisi pekerjaan..." oninput="filterLowongan()">
+    </div>
+    <div class="filter-row" id="filterRow">
+        <button class="filter-btn active" onclick="setFilter('semua', this)">Semua</button>
+        <button class="filter-btn" onclick="setFilter('Full-time', this)">Full-time</button>
+        <button class="filter-btn" onclick="setFilter('Part-time', this)">Part-time</button>
+        <button class="filter-btn" onclick="setFilter('Kontrak', this)">Kontrak</button>
+    </div>
+    <div id="lowonganContainer" class="loading">Memuat lowongan...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'https://avid-widget-revoke.ngrok-free.dev';
+
+let allLowongan = [];
+let activeFilter = 'semua';
+
+async function loadLowongan() {
+    try {
+        const res = await fetch(API_BASE + '/api/lowongan');
+        const data = await res.json();
+        if (data.success) {
+            allLowongan = data.data;
+            renderLowongan(allLowongan);
+        } else {
+            showEmpty('Gagal memuat lowongan');
+        }
+    } catch(e) {
+        showEmpty('Tidak dapat terhubung ke server');
+    }
+}
+
+function renderLowongan(list) {
+    const container = document.getElementById('lowonganContainer');
+    if (!list.length) { showEmpty('Tidak ada lowongan tersedia saat ini'); return; }
+    container.className = 'lowongan-grid';
+    container.innerHTML = list.map(l => `
+        <div class="card" onclick="pilihLowongan(${l.id}, '${l.posisi.replace(/'/g, "\\'")}')">
+            <span class="card-badge badge-aktif">${l.status}</span>
+            <span class="card-badge badge-fulltime" style="margin-left:6px;">${l.tipe}</span>
+            <h3>${l.posisi}</h3>
+            <div class="card-meta">
+                <span>📍 ${l.lokasi}</span>
+            </div>
+            <p class="card-desc">${l.deskripsi || 'Lihat detail posisi ini'}</p>
+            <button class="btn-daftar">Daftar Sekarang</button>
+        </div>
+    `).join('');
+}
+
+function setFilter(tipe, btn) {
+    activeFilter = tipe;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterLowongan();
+}
+
+function filterLowongan() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = allLowongan;
+    if (activeFilter !== 'semua') filtered = filtered.filter(l => l.tipe === activeFilter);
+    if (q) filtered = filtered.filter(l => l.posisi.toLowerCase().includes(q) || (l.deskripsi||'').toLowerCase().includes(q));
+    renderLowongan(filtered);
+}
+
+function pilihLowongan(id, posisi) {
+    sessionStorage.setItem('selectedLowonganId', id);
+    sessionStorage.setItem('selectedPosisi', posisi);
+    showToast('Posisi dipilih: ' + posisi);
+    setTimeout(() => { window.location.href = 'formpelamar.html'; }, 800);
+}
+
+function showEmpty(msg) {
+    const container = document.getElementById('lowonganContainer');
+    container.className = '';
+    container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>${msg}</p></div>`;
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+loadLowongan();
+</script>
+</body>
+</html>
